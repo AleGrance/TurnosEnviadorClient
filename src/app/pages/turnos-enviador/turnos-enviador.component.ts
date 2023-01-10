@@ -31,7 +31,7 @@ export class TurnosEnviadorComponent implements OnInit {
   pipe = new DatePipe('en-US');
 
   // Tiempo de retraso entre envios
-  delayTime = 5000;
+  tiempoRetraso = 5000;
 
   ngOnInit(): void {
     // Get turnos - TurnosEnviador
@@ -65,6 +65,8 @@ export class TurnosEnviadorComponent implements OnInit {
     if (this.turnos.length === 0) {
       console.log('Sin agendamientos pendientes de envio!');
     }
+
+    this.showSpinner();
 
     for (let t of this.turnos) {
       let fecha_turno = this.pipe.transform(t.fecha_turno, 'dd/MM/yyyy');
@@ -115,8 +117,11 @@ export class TurnosEnviadorComponent implements OnInit {
       console.log('Crear imagen!', cliente, contacto, idTurno);
 
       // Se llama a la funcion de retraso para ejecutar todo cada 5 segundos
-      await this.sleep(this.delayTime);
+      await this.sleep(this.tiempoRetraso);
     }
+
+    this.hideSpinner();
+    this.showAviso();
   }
 
   // Se crea la IMAGEN de la tarjeta creada
@@ -164,7 +169,7 @@ export class TurnosEnviadorComponent implements OnInit {
     mimeType: any
   ) {
     let objWa = {
-      message: 'El cuerpo del mensaje',
+      message: 'Usted ha sido agendado!',
       phone: contacto,
       mimeType: mimeType,
       data: base64,
@@ -175,7 +180,7 @@ export class TurnosEnviadorComponent implements OnInit {
     this.enviarMensaje(objWa, idTurno, cliente);
   }
 
-  // Se envia el objeto del mensaje a la API del EnviadorMasivo
+  // Se envia el mensaje atravez del EnviadorMasivo
   enviarMensaje(objWa: any, idTurno: any, cliente: any) {
     //let turnoId = this.idTurno;
     this.apiEnviador
@@ -251,6 +256,22 @@ export class TurnosEnviadorComponent implements OnInit {
       },
     });
   }
+
+  showSpinner() {
+    (<HTMLInputElement>document.getElementById('spinner')).style.display =
+      'block';
+  }
+
+  hideSpinner() {
+    (<HTMLInputElement>document.getElementById('spinner')).style.display =
+      'none';
+  }
+
+  showAviso() {
+    (<HTMLInputElement>document.getElementById('aviso')).style.display =
+      'block';
+  }
+
 
   // Con observables y manejadores de errores
   // posteo2(objWa: any) {

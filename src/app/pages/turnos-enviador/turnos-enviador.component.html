@@ -1,13 +1,22 @@
-
-
 <div class="container">
+  <div class="row">Inicia el envio al hacer clic en el boton:</div>
   <div class="row">
-    Inicia el envio al hacer clic en el boton:
-  </div>
-  <div class="ro">
-    <button class="btn btn-success" (click)="iniciarEnvio()">Recorrer listado</button>
+    <button class="btn btn-success" (click)="iniciarEnvio()">
+      Recorrer listado
+    </button>
   </div>
   <div class="row" id="cards">
-    {{cards}}
+    {{ cards }}
+  </div>
+  <div
+    class="spinner-border text-success"
+    id="spinner"
+    role="status"
+    style="display: none"
+  >
+    <span class="sr-only">Loading...</span>
+  </div>
+  <div class="row" id="aviso" style="display: none">
+    <h5>Se completo el envio!</h5>
   </div>
 </div>
