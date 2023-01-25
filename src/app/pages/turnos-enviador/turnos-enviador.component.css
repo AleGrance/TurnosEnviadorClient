@@ -1,0 +1,24 @@
+table {
+  background-color: rgb(25,25,25);
+  color: white;
+  table-layout: fixed; /* This will ensure the cells within the table will keep there width. */
+}
+
+.body-div {
+  background-color: rgb(25,25,25);
+  font-family: verdana;
+  font-size: x-small;
+  height: 600px;
+  padding-bottom: 5px;
+}
+
+.body-header {
+  background-color: rgb(25,25,25);
+  font-family: verdana;
+  font-size: x-small;
+}
+
+#cards {
+  background-image: "../../../assets/img/backTurno.jpeg";
+}
+

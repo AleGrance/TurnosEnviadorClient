@@ -158,7 +158,8 @@ export class EnviadorComponent implements OnInit {
         if (sheets.length) {
           const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheets[0]]);
           this.clientesWa = rows;
-          //console.log(this.clientesWa);
+          console.log(this.clientesWa);
+          this.checkNumbers(this.clientesWa);
 
           for (let i = 0; i < this.clientesWa.length; i++) {
             if (i === this.index) {
@@ -170,6 +171,22 @@ export class EnviadorComponent implements OnInit {
         }
       };
       reader.readAsArrayBuffer(file);
+    }
+  }
+
+  checkNumbers(clientes: any) {
+    for(let num of clientes){
+      console.log(num.NRO_CEL.length);
+
+      if(num.NRO_CEL.length < 12) {
+        console.log("Este nro esta mal: ", num.NRO_CEL);
+        let nroErrado = num.NRO_CEL;
+
+
+
+      }
+
+
     }
   }
 

@@ -7,6 +7,7 @@ import * as htmlToImage from 'html-to-image';
 import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 import { Observable } from 'rxjs';
 import { ApienviadorService } from 'src/app/services/apienviador.service';
+import { Toast, ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-turnos-enviador',
@@ -16,7 +17,8 @@ import { ApienviadorService } from 'src/app/services/apienviador.service';
 export class TurnosEnviadorComponent implements OnInit {
   constructor(
     private api: ApiService,
-    private apiEnviador: ApienviadorService
+    private apiEnviador: ApienviadorService,
+    private toastr: ToastrService
   ) {}
 
   turnos: any = [];
@@ -34,13 +36,22 @@ export class TurnosEnviadorComponent implements OnInit {
   tiempoRetraso = 5000;
 
   ngOnInit(): void {
-    // Get turnos - TurnosEnviador
-    // Solamente los que estan pendiente de envío - API de Turnos
+    this.getTurnosPendientes();
+
+    setInterval((): void => {
+      //this.getTurnosPendientes();
+    }, 1000 * 60);
+  }
+
+  // Get turnos - TurnosEnviador
+  // Solamente los que estan pendiente de envío - API de Turnos
+  getTurnosPendientes() {
     this.api
       .get('turnosPendientes')
       .pipe(
         map((data) => {
           this.turnos = data;
+          //this.iniciarEnvio();
           if (this.turnos.length === 0) {
             console.log('Sin agendamientos pendientes de envio!');
           }
@@ -52,7 +63,7 @@ export class TurnosEnviadorComponent implements OnInit {
         //   console.log('Resultado del post: ', result);
         // },
         error(msg) {
-          alert('Error en la petición GET: ' + msg.message);
+          alert('Error al traer los turnos PostgreSQL: ' + msg.message);
           console.log('Error en la petición GET: ', msg.message);
         },
       });
@@ -64,9 +75,10 @@ export class TurnosEnviadorComponent implements OnInit {
   async iniciarEnvio() {
     if (this.turnos.length === 0) {
       console.log('Sin agendamientos pendientes de envio!');
+      this.toastr.warning('Sin turnos por el momento!', 'Alerta!');
     }
 
-    this.showSpinner();
+    //this.showSpinner();
 
     for (let t of this.turnos) {
       let fecha_turno = this.pipe.transform(t.fecha_turno, 'dd/MM/yyyy');
@@ -76,17 +88,63 @@ export class TurnosEnviadorComponent implements OnInit {
       let sucursal = t.sucursal;
       let cliente = t.cliente;
       let contacto = t.contacto_cliente;
+      let id = t.id_turno;
 
-      // Se crea la variable global del ID del turno. para modificar su estado una vez que se envie el mensaje
+      let objetoTurno = {
+        id: id,
+        fecha: fecha_turno,
+        hora: hora_turno,
+        comentario: comentario,
+        pro: profesional,
+        suc: sucursal,
+        cli: cliente,
+        contacto: contacto,
+      };
+
+      // Se escribe en la tabla de los logs de los envios realizados
+      let outputTable = (<HTMLInputElement>(
+        document.getElementById('outputTable')
+      )).innerHTML;
+
+      (<HTMLInputElement>document.getElementById('outputTable')).innerHTML =
+        `<tr>
+        <th scope="row">` +
+        objetoTurno.id +
+        `</th>
+        <td>` +
+        objetoTurno.fecha +
+        `</td>
+        <td>` +
+        objetoTurno.hora +
+        `</td>
+        <td>` +
+        objetoTurno.comentario +
+        `</td>
+        <td>` +
+        objetoTurno.pro +
+        `</td>
+        <td>` +
+        objetoTurno.suc +
+        `</td>
+        <td>` +
+        objetoTurno.cli +
+        `</td>
+        <td>` +
+        objetoTurno.contacto +
+        `</td>
+        </tr>
+        ` +
+        outputTable;
+
+      // Se crea la variable del ID del turno. para modificar su estado una vez que se envie el mensaje
       let idTurno = t.id_turno;
 
       // Aca se forma la tarjeta con los datos del turno
       this.cards =
         `
-        <div class="col">
-          <div class="card" style="width: 18rem;">
-            <div class="card-body" id="card-body" style="background-color: white;">
-              <h5 class="card-title">` +
+        <img class="card-img-top" src="../../../assets/img/odontos.svg" alt="Card image cap" id="imagen">
+        <div class="card-body" id="card-body" style="background-color: white;">
+          <h5 class="card-title">` +
         cliente +
         `</h5>
               <h5 class="card-title">Fecha del turno: ` +
@@ -104,32 +162,34 @@ export class TurnosEnviadorComponent implements OnInit {
               <p class="card-text">` +
         comentario +
         `</p>
-            </div>
-          </div>
         </div>
-
         `;
 
       // Aca se escribe en el DOM
-      (<HTMLInputElement>document.getElementById('cards')).innerHTML =
+      (<HTMLInputElement>document.getElementById('card')).innerHTML =
         this.cards;
-      this.crearImg(contacto, idTurno, cliente);
-      console.log('Crear imagen!', cliente, contacto, idTurno);
+
+      // Se retrasa la llamada a la función debido a que el DOM no renderiza de inmediato el logo de odontos
+      setTimeout(() => {
+        this.crearImg(contacto, idTurno, cliente);
+      }, 1000)
+
+      //console.log('Crear imagen!', cliente, contacto, idTurno);
 
       // Se llama a la funcion de retraso para ejecutar todo cada 5 segundos
       await this.sleep(this.tiempoRetraso);
     }
-
-    this.hideSpinner();
-    this.showAviso();
+    this.turnos = [];
+    //this.hideSpinner();
+    //this.showAviso();
   }
 
   // Se crea la IMAGEN de la tarjeta creada
   crearImg(contacto: any, idTurno: any, cliente: any) {
-    let node = <HTMLInputElement>document.getElementById('card-body');
+    let node = <HTMLInputElement>document.getElementById('card');
 
     htmlToImage
-      .toPng(node)
+      .toJpeg(node)
       .then((dataUrl) => {
         var img = new Image();
         img.src = dataUrl;
@@ -151,7 +211,12 @@ export class TurnosEnviadorComponent implements OnInit {
       });
 
     // Descargar imagen en JPEG
-    // htmlToImage.toJpeg((<HTMLInputElement>document.getElementById('card-body')), { quality: 0.95 })
+    // let image = <HTMLInputElement>document.getElementById('card');
+
+    // htmlToImage
+    //   .toJpeg(image, {
+    //     quality: 0.95,
+    //   })
     //   .then(function (dataUrl) {
     //     var link = document.createElement('a');
     //     link.download = cliente + '.jpeg';
@@ -234,7 +299,7 @@ export class TurnosEnviadorComponent implements OnInit {
   notificarError(contacto: any, idTurno: any, cliente: any) {
     let objWa = {
       message:
-        'No se pudo enviar el registro del turno al cliente: ' +
+        'No se pudo enviar la notificación de agendamiento del turno al cliente: ' +
         cliente +
         ' con el número: ' +
         contacto +
@@ -271,7 +336,6 @@ export class TurnosEnviadorComponent implements OnInit {
     (<HTMLInputElement>document.getElementById('aviso')).style.display =
       'block';
   }
-
 
   // Con observables y manejadores de errores
   // posteo2(objWa: any) {

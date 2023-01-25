@@ -8,11 +8,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { EnviadorComponent } from './pages/enviador/enviador.component';
 import { TurnosEnviadorComponent } from './pages/turnos-enviador/turnos-enviador.component';
+import { MetrepaytestComponent } from './pages/metrepaytest/metrepaytest.component';
 @NgModule({
   declarations: [
     AppComponent,
     EnviadorComponent,
-    TurnosEnviadorComponent
+    TurnosEnviadorComponent,
+    MetrepaytestComponent
   ],
   imports: [
     CommonModule, // Se importa para el toastr
