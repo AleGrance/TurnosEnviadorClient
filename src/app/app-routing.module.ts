@@ -9,7 +9,7 @@ import { TurnosEnviadorComponent } from './pages/turnos-enviador/turnos-enviador
 const routes: Routes = [
   {
     path: '',
-    redirectTo: '/metrepaytest',
+    redirectTo: '/turnos',
     pathMatch: 'full'
   },
   {

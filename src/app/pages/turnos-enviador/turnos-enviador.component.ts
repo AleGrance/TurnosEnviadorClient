@@ -132,6 +132,7 @@ export class TurnosEnviadorComponent implements OnInit {
         <td>` +
         objetoTurno.contacto +
         `</td>
+        <td>Sí</td>
         </tr>
         ` +
         outputTable;
@@ -172,7 +173,7 @@ export class TurnosEnviadorComponent implements OnInit {
       // Se retrasa la llamada a la función debido a que el DOM no renderiza de inmediato el logo de odontos
       setTimeout(() => {
         this.crearImg(contacto, idTurno, cliente);
-      }, 1000)
+      }, 1000);
 
       //console.log('Crear imagen!', cliente, contacto, idTurno);
 
