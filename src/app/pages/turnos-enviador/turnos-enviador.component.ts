@@ -86,10 +86,17 @@ export class TurnosEnviadorComponent implements OnInit {
       let comentario = t.comentario;
       let profesional = t.profesional;
       let sucursal = t.sucursal;
+      let dir_sucursal = t.dir_sucursal;
+      let tel_sucursal = t.tel_sucursal;
       let cliente = t.cliente;
+      let plan_cliente = t.plan_cliente;
+      let nro_cert_cliente = t.nro_cert_cliente;
       let contacto = t.contacto_cliente;
+      let usuario = t.usuario;
+      // la fecha del envio se toma en la var global por la fecha del sistema
       let id = t.id_turno;
 
+      // Para la tabla en html
       let objetoTurno = {
         id: id,
         fecha: fecha_turno,
@@ -106,6 +113,7 @@ export class TurnosEnviadorComponent implements OnInit {
         document.getElementById('outputTable')
       )).innerHTML;
 
+      // Se crea la tabla tipo console log que se muestra en el frontend
       (<HTMLInputElement>document.getElementById('outputTable')).innerHTML =
         `<tr>
         <th scope="row">` +
@@ -148,6 +156,12 @@ export class TurnosEnviadorComponent implements OnInit {
           <h5 class="card-title">` +
         cliente +
         `</h5>
+        <h5 class="card-title">` +
+        plan_cliente +
+        `</h5>
+        <p class="card-text" style="margin: 0px;">` +
+        nro_cert_cliente +
+        `</p>
               <h5 class="card-title">Fecha del turno: ` +
         fecha_turno +
         `</h5>
@@ -157,12 +171,22 @@ export class TurnosEnviadorComponent implements OnInit {
               <h6 class="card-subtitle mb-2 text-muted">Sucursal: ` +
         sucursal +
         `</h6>
+        <h6 class="card-subtitle mb-2 text-muted">Direc: ` +
+        dir_sucursal +
+        `</h6>
+        <h6 class="card-subtitle mb-2 text-muted">Tel: ` +
+        tel_sucursal +
+        `</h6>
               <h6 class="card-subtitle mb-2 text-muted">Profesional: ` +
         profesional +
         `</h6>
-              <p class="card-text">` +
+              <p class="card-text" style="margin: 0px;">` +
         comentario +
         `</p>
+        <p class="card-text" style="margin: 0px;">` +
+        usuario +
+        `</p>
+        <p class="card-text" style="margin: 0px;">01-02-2023</p>
         </div>
         `;
 
@@ -265,7 +289,7 @@ export class TurnosEnviadorComponent implements OnInit {
 
           if (data.responseExSave.id) {
             console.log('El id es: ', idTurno);
-            this.updateEstatus(idTurno);
+            //this.updateEstatus(idTurno);
           }
         })
       )
