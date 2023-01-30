@@ -31,6 +31,9 @@ export class TurnosEnviadorComponent implements OnInit {
 
   // Formatear fecha
   pipe = new DatePipe('en-US');
+  // la fecha del envio se toma en la var global por la fecha del sistema
+  hoy = new Date();
+  fechaHoy = this.pipe.transform(this.hoy, 'dd/MM/yyyy');
 
   // Tiempo de retraso entre envios
   tiempoRetraso = 5000;
@@ -81,19 +84,17 @@ export class TurnosEnviadorComponent implements OnInit {
     //this.showSpinner();
 
     for (let t of this.turnos) {
-      let fecha_turno = this.pipe.transform(t.fecha_turno, 'dd/MM/yyyy');
-      let hora_turno = t.hora_turno;
-      let comentario = t.comentario;
-      let profesional = t.profesional;
-      let sucursal = t.sucursal;
-      let dir_sucursal = t.dir_sucursal;
-      let tel_sucursal = t.tel_sucursal;
-      let cliente = t.cliente;
-      let plan_cliente = t.plan_cliente;
-      let nro_cert_cliente = t.nro_cert_cliente;
-      let contacto = t.contacto_cliente;
-      let usuario = t.usuario;
-      // la fecha del envio se toma en la var global por la fecha del sistema
+      //let fecha_turno = this.pipe.transform(t.fecha_turno, 'dd/MM/yyyy');
+      let fecha_turno = t.FECHA;
+      let hora_turno = t.HORA;
+      let profesional = t.NOMBRE_COMERCIAL; // Doctor
+      let sucursal = t.SUCURSAL;
+      let dir_sucursal = t.DIRECCION;
+      let tel_sucursal = "021-412-9000";
+      let cliente = t.CLIENTE;
+      let plan_cliente = t.PLAN_CLIENTE;
+      let nro_cert_cliente = t.NRO_CERT;
+      let contacto = t.TELEFONO_MOVIL;
       let id = t.id_turno;
 
       // Para la tabla en html
@@ -101,7 +102,6 @@ export class TurnosEnviadorComponent implements OnInit {
         id: id,
         fecha: fecha_turno,
         hora: hora_turno,
-        comentario: comentario,
         pro: profesional,
         suc: sucursal,
         cli: cliente,
@@ -125,9 +125,7 @@ export class TurnosEnviadorComponent implements OnInit {
         <td>` +
         objetoTurno.hora +
         `</td>
-        <td>` +
-        objetoTurno.comentario +
-        `</td>
+
         <td>` +
         objetoTurno.pro +
         `</td>
@@ -180,12 +178,7 @@ export class TurnosEnviadorComponent implements OnInit {
               <h6 class="card-subtitle mb-2 text-muted">Profesional: ` +
         profesional +
         `</h6>
-              <p class="card-text" style="margin: 0px;">` +
-        comentario +
-        `</p>
-        <p class="card-text" style="margin: 0px;">` +
-        usuario +
-        `</p>
+
         <p class="card-text" style="margin: 0px;">01-02-2023</p>
         </div>
         `;
