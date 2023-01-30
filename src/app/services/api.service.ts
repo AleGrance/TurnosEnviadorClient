@@ -6,8 +6,9 @@ import { Injectable } from '@angular/core';
 })
 export class ApiService {
   // Local TurnosDB
-  // url: string = 'http://localhost:3000';
-  url: string = 'http://192.168.10.245:3000';
+  url: string = 'http://localhost:3000';
+  // Base Postgresql del 245
+  //url: string = 'http://192.168.10.245:3000';
 
   constructor(public http: HttpClient) {}
 

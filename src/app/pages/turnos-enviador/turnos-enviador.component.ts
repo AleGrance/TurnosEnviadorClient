@@ -90,7 +90,7 @@ export class TurnosEnviadorComponent implements OnInit {
       let profesional = t.NOMBRE_COMERCIAL; // Doctor
       let sucursal = t.SUCURSAL;
       let dir_sucursal = t.DIRECCION;
-      let tel_sucursal = "021-412-9000";
+      let tel_sucursal = '021-412-9000';
       let cliente = t.CLIENTE;
       let plan_cliente = t.PLAN_CLIENTE;
       let nro_cert_cliente = t.NRO_CERT;
@@ -125,7 +125,6 @@ export class TurnosEnviadorComponent implements OnInit {
         <td>` +
         objetoTurno.hora +
         `</td>
-
         <td>` +
         objetoTurno.pro +
         `</td>
@@ -179,7 +178,9 @@ export class TurnosEnviadorComponent implements OnInit {
         profesional +
         `</h6>
 
-        <p class="card-text" style="margin: 0px;">01-02-2023</p>
+        <p class="card-text" style="margin: 0px;">` +
+        this.fechaHoy +
+        `</p>
         </div>
         `;
 
@@ -274,15 +275,23 @@ export class TurnosEnviadorComponent implements OnInit {
           objetoRetorno = data;
           console.log('Este es el objeto retorno POST: ', objetoRetorno);
 
+          if (data.responseExSave.unknow) {
+            console.log('Error en este nro: ', objWa.phone);
+            // Se puede auto enviar un mensaje indicando que no se envió por X problema
+            //this.notificarError(objWa.phone, idTurno, cliente);
+            this.updateEstatusWa(idTurno);
+          }
+
           if (data.responseExSave.error) {
             console.log('Error en este nro: ', objWa.phone);
             // Se puede auto enviar un mensaje indicando que no se envió por X problema
             //this.notificarError(objWa.phone, idTurno, cliente);
+            this.updateEstatusWa(idTurno);
           }
 
           if (data.responseExSave.id) {
             console.log('El id es: ', idTurno);
-            //this.updateEstatus(idTurno);
+            this.updateEstatus(idTurno);
           }
         })
       )
@@ -309,6 +318,23 @@ export class TurnosEnviadorComponent implements OnInit {
       },
       error(msg) {
         console.log('Error en la consulta PUT: ', msg.message);
+      },
+    });
+  }
+
+  // Si el envio no fue exitoso se cambia el estado del turno registrado
+  updateEstatusWa(idTurno: any) {
+    // Se crea el objeto turno con el campo estado_envio modificado
+    let objTurno = {
+      estado_envio: 3,
+    };
+
+    this.api.put('turnos/' + idTurno, objTurno).subscribe({
+      next(result: any) {
+        console.log('Resultado del PUT luego actualizar estado NRO SIN WHATSAPP: ', result);
+      },
+      error(msg) {
+        console.log('Error en la consulta PUT NRO SIN WHATSAPP: ', msg.message);
       },
     });
   }

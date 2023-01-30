@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class ApienviadorService {
-  // Local EnviadorAPI
+  // Local EnviadorAPI Whatsapp
   url: string = 'http://localhost:3001';
 
   constructor(public http: HttpClient) { }
