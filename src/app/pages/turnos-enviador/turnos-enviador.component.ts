@@ -29,8 +29,9 @@ export class TurnosEnviadorComponent implements OnInit {
   fileMimeTypeMedia = '';
   fileBase64Media = '';
   mensajePie = `Se ha registrado su turno! 😁
-  Para cualquier consulta contactar al siguiente número:
-  https://wa.me/595214129000`;
+Para RE Confirmar turno o cualquier consulta contactar al siguiente número:
+https://wa.me/595214129000`;
+  textoAtencion = 'ATENCIÓN: El turno debe ser Re confirmado con 24Hs de anticipación, en caso de no hacerlo el turno queda disponible para otro paciente.';
 
   // Formatear fecha
   pipe = new DatePipe('en-US');
@@ -159,16 +160,16 @@ export class TurnosEnviadorComponent implements OnInit {
           <h6 class="card-title">` +
         cliente +
         `</h6>
-        <h6 class="card-title">` +
+        <h6 class="card-title" style="margin-bottom: 0px;">` +
         plan_cliente +
         `</h6>
-        <p class="card-text" style="margin: 0px;">` +
+        <p class="card-text" style="margin-top: 0px; margin-bottom: 2px">` +
         nro_cert_cliente +
         `</p>
               <h5 class="card-title" style="margin: 0px;">Fecha: ` +
         fecha_turno +
         `</h5>
-              <h5 class="card-title" style="margin: 0px;">Hora: ` +
+              <h5 class="card-title" style="margin-top: 0px;">Hora: ` +
         hora_turno +
         `</h5>
               <h6 class="card-subtitle mb-2 text-muted">Sucursal: ` +
@@ -178,9 +179,13 @@ export class TurnosEnviadorComponent implements OnInit {
         dir_sucursal +
         `</h6>
 
-              <h6 class="card-subtitle mb-2 text-muted">Profesional: ` +
+              <h6 class="card-subtitle mb-2 text-muted">` +
         profesional +
         `</h6>
+
+        <p class="card-text" style="margin-bottom: 2px">` +
+        this.textoAtencion +
+        `</p>
 
         <p class="card-text" style="margin: 0px;">` +
         this.fechaHoy +
@@ -348,7 +353,9 @@ export class TurnosEnviadorComponent implements OnInit {
   }
 
   detenerEnvio() {
+    console.log('DETENIDO!');
     this.turnos = [];
+    return;
   }
 
   // En caso de tener error en el envio de agendamiento de turno al cliente, se le notifica al numero vinculado con los datos del cliente
