@@ -28,6 +28,7 @@ export class TurnosEnviadorComponent implements OnInit {
   // Datos del Mensaje de whatsapp
   fileMimeTypeMedia = '';
   fileBase64Media = '';
+  mensajePie = 'Su turno fue registrado con éxito!'
 
   // Formatear fecha
   pipe = new DatePipe('en-US');
@@ -43,7 +44,7 @@ export class TurnosEnviadorComponent implements OnInit {
 
     setInterval((): void => {
       //this.getTurnosPendientes();
-    }, 1000 * 60);
+    }, 10000 * 60);
   }
 
   // Get turnos - TurnosEnviador
@@ -54,10 +55,11 @@ export class TurnosEnviadorComponent implements OnInit {
       .pipe(
         map((data) => {
           this.turnos = data;
-          //this.iniciarEnvio();
           if (this.turnos.length === 0) {
             console.log('Sin agendamientos pendientes de envio!');
+            return
           }
+          //this.iniciarEnvio();
           console.log(this.turnos);
         })
       )
@@ -66,8 +68,8 @@ export class TurnosEnviadorComponent implements OnInit {
         //   console.log('Resultado del post: ', result);
         // },
         error(msg) {
-          alert('Error al traer los turnos PostgreSQL: ' + msg.message);
-          console.log('Error en la petición GET: ', msg.message);
+          alert('Error al traer los turnos PostgreSQL GET: ' + msg.message);
+          console.log('Error al traer los turnos PostgreSQL GET: ', msg.message);
         },
       });
   }
@@ -77,7 +79,6 @@ export class TurnosEnviadorComponent implements OnInit {
 
   async iniciarEnvio() {
     if (this.turnos.length === 0) {
-      console.log('Sin agendamientos pendientes de envio!');
       this.toastr.warning('Sin turnos por el momento!', 'Alerta!');
     }
 
@@ -253,7 +254,7 @@ export class TurnosEnviadorComponent implements OnInit {
     mimeType: any
   ) {
     let objWa = {
-      message: 'Usted ha sido agendado!',
+      message: this.mensajePie,
       phone: contacto,
       mimeType: mimeType,
       data: base64,
