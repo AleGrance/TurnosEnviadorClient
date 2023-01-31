@@ -175,9 +175,9 @@ https://wa.me/595214129000`;
               <h6 class="card-subtitle mb-2 text-muted">Sucursal: ` +
         sucursal +
         `</h6>
-        <h6 class="card-subtitle mb-2 text-muted">Direc: ` +
+        <p class="card-text" style="margin-top: 0px;"><small class="text-muted">` +
         dir_sucursal +
-        `</h6>
+        `</small></p>
 
               <h6 class="card-subtitle mb-2 text-muted">` +
         profesional +
