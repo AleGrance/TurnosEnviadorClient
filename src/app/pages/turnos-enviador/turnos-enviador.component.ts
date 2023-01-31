@@ -31,7 +31,7 @@ export class TurnosEnviadorComponent implements OnInit {
   mensajePie = `Se ha registrado su turno! 😁
 Para RE Confirmar turno o cualquier consulta contactar al siguiente número:
 https://wa.me/595214129000`;
-  textoAtencion = 'ATENCIÓN: El turno debe ser Re confirmado con 24Hs de anticipación, en caso de no hacerlo el turno queda disponible para otro paciente.';
+  textoAtencion = 'ATENCIÓN: El turno debe ser Re confirmado con 24Hs de anticipación, en caso de no hacerlo el turno queda disponible para otro paciente. Para Re confirmar: 021-412-9000';
 
   // Formatear fecha
   pipe = new DatePipe('en-US');
@@ -160,9 +160,9 @@ https://wa.me/595214129000`;
           <h6 class="card-title">` +
         cliente +
         `</h6>
-        <h6 class="card-title" style="margin-bottom: 0px;">` +
+        <p class="card-text" style="margin-bottom: 0px">` +
         plan_cliente +
-        `</h6>
+        `</p>
         <p class="card-text" style="margin-top: 0px; margin-bottom: 2px">` +
         nro_cert_cliente +
         `</p>
