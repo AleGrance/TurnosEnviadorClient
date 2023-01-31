@@ -265,7 +265,7 @@ export class TurnosEnviadorComponent implements OnInit {
     this.enviarMensaje(objWa, idTurno, cliente);
   }
 
-  // Se envia el mensaje atravez del EnviadorMasivo
+  // Se envia el mensaje atravez de la API de WhatsappWeb
   enviarMensaje(objWa: any, idTurno: any, cliente: any) {
     //let turnoId = this.idTurno;
     this.apiEnviador
@@ -290,6 +290,7 @@ export class TurnosEnviadorComponent implements OnInit {
             this.updateEstatusWa(idTurno);
           }
 
+          // Si el envio fu exitoso
           if (data.responseExSave.id) {
             console.log('El id es: ', idTurno);
             this.updateEstatus(idTurno);
@@ -308,24 +309,24 @@ export class TurnosEnviadorComponent implements OnInit {
 
   // Una vez que el envio haya sido exitoso. Se actualiza el estado del turno en la DB PostgreSQL
   updateEstatus(idTurno: any) {
-    // Se crea el objeto turno con el campo estado_envio modificado
+    // Se crea el objeto turno con el campo estado_envio modificado a 1
     let objTurno = {
       estado_envio: 1,
     };
 
     this.api.put('turnos/' + idTurno, objTurno).subscribe({
       next(result: any) {
-        console.log('Resultado del PUT: ', result);
+        console.log('Resultado del PUT ENVIO CORRECTO: ', result);
       },
       error(msg) {
-        console.log('Error en la consulta PUT: ', msg.message);
+        console.log('Error en la consulta PUT ENVIO CORRECTO: ', msg.message);
       },
     });
   }
 
   // Si el envio no fue exitoso se cambia el estado del turno registrado
   updateEstatusWa(idTurno: any) {
-    // Se crea el objeto turno con el campo estado_envio modificado
+    // Se crea el objeto turno con el campo estado_envio modificado a 3
     let objTurno = {
       estado_envio: 3,
     };
