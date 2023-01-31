@@ -28,7 +28,9 @@ export class TurnosEnviadorComponent implements OnInit {
   // Datos del Mensaje de whatsapp
   fileMimeTypeMedia = '';
   fileBase64Media = '';
-  mensajePie = 'Su turno fue registrado con éxito!'
+  mensajePie = `Se ha registrado su turno! 😁
+  Para cualquier consulta contactar al siguiente número:
+  https://wa.me/595214129000`;
 
   // Formatear fecha
   pipe = new DatePipe('en-US');
@@ -57,7 +59,7 @@ export class TurnosEnviadorComponent implements OnInit {
           this.turnos = data;
           if (this.turnos.length === 0) {
             console.log('Sin agendamientos pendientes de envio!');
-            return
+            return;
           }
           //this.iniciarEnvio();
           console.log(this.turnos);
@@ -69,7 +71,10 @@ export class TurnosEnviadorComponent implements OnInit {
         // },
         error(msg) {
           alert('Error al traer los turnos PostgreSQL GET: ' + msg.message);
-          console.log('Error al traer los turnos PostgreSQL GET: ', msg.message);
+          console.log(
+            'Error al traer los turnos PostgreSQL GET: ',
+            msg.message
+          );
         },
       });
   }
@@ -91,7 +96,7 @@ export class TurnosEnviadorComponent implements OnInit {
       let profesional = t.NOMBRE_COMERCIAL; // Doctor
       let sucursal = t.SUCURSAL;
       let dir_sucursal = t.DIRECCION;
-      let tel_sucursal = '021-412-9000';
+      //let tel_sucursal = '021-412-9000';
       let cliente = t.CLIENTE;
       let plan_cliente = t.PLAN_CLIENTE;
       let nro_cert_cliente = t.NRO_CERT;
@@ -151,19 +156,19 @@ export class TurnosEnviadorComponent implements OnInit {
         `
         <img class="card-img-top" src="../../../assets/img/odontos.svg" alt="Card image cap" id="imagen">
         <div class="card-body" id="card-body" style="background-color: white;">
-          <h5 class="card-title">` +
+          <h6 class="card-title">` +
         cliente +
-        `</h5>
-        <h5 class="card-title">` +
+        `</h6>
+        <h6 class="card-title">` +
         plan_cliente +
-        `</h5>
+        `</h6>
         <p class="card-text" style="margin: 0px;">` +
         nro_cert_cliente +
         `</p>
-              <h5 class="card-title">Fecha del turno: ` +
+              <h5 class="card-title" style="margin: 0px;">Fecha: ` +
         fecha_turno +
         `</h5>
-              <h5 class="card-title">Hora del turno: ` +
+              <h5 class="card-title" style="margin: 0px;">Hora: ` +
         hora_turno +
         `</h5>
               <h6 class="card-subtitle mb-2 text-muted">Sucursal: ` +
@@ -172,9 +177,7 @@ export class TurnosEnviadorComponent implements OnInit {
         <h6 class="card-subtitle mb-2 text-muted">Direc: ` +
         dir_sucursal +
         `</h6>
-        <h6 class="card-subtitle mb-2 text-muted">Tel: ` +
-        tel_sucursal +
-        `</h6>
+
               <h6 class="card-subtitle mb-2 text-muted">Profesional: ` +
         profesional +
         `</h6>
@@ -333,12 +336,19 @@ export class TurnosEnviadorComponent implements OnInit {
 
     this.api.put('turnos/' + idTurno, objTurno).subscribe({
       next(result: any) {
-        console.log('Resultado del PUT luego actualizar estado NRO SIN WHATSAPP: ', result);
+        console.log(
+          'Resultado del PUT luego actualizar estado NRO SIN WHATSAPP: ',
+          result
+        );
       },
       error(msg) {
         console.log('Error en la consulta PUT NRO SIN WHATSAPP: ', msg.message);
       },
     });
+  }
+
+  detenerEnvio() {
+    this.turnos = [];
   }
 
   // En caso de tener error en el envio de agendamiento de turno al cliente, se le notifica al numero vinculado con los datos del cliente
