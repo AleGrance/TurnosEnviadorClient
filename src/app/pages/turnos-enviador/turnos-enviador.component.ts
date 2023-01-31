@@ -29,7 +29,7 @@ export class TurnosEnviadorComponent implements OnInit {
   fileMimeTypeMedia = '';
   fileBase64Media = '';
   mensajePie = `Se ha registrado su turno! 😁
-Para RE Confirmar turno o cualquier consulta contactar al siguiente número:
+Para cualquier consulta, contáctanos llamando al 0214129000 o escribinos al siguiente link:
 https://wa.me/595214129000`;
   textoAtencion = 'ATENCIÓN: El turno debe ser Re confirmado con 24Hs de anticipación, en caso de no hacerlo el turno queda disponible para otro paciente. Para Re confirmar: 021-412-9000';
 
@@ -46,7 +46,7 @@ https://wa.me/595214129000`;
     this.getTurnosPendientes();
 
     setInterval((): void => {
-      //this.getTurnosPendientes();
+      this.getTurnosPendientes();
     }, 10000 * 60);
   }
 
@@ -62,7 +62,7 @@ https://wa.me/595214129000`;
             console.log('Sin agendamientos pendientes de envio!');
             return;
           }
-          //this.iniciarEnvio();
+          this.iniciarEnvio();
           console.log(this.turnos);
         })
       )
@@ -288,20 +288,20 @@ https://wa.me/595214129000`;
             console.log('Error en este nro: ', objWa.phone);
             // Se puede auto enviar un mensaje indicando que no se envió por X problema
             //this.notificarError(objWa.phone, idTurno, cliente);
-            this.updateEstatusWa(idTurno);
+            this.updateEstatusERROR(idTurno);
           }
 
           if (data.responseExSave.error) {
             console.log('Error en este nro: ', objWa.phone);
             // Se puede auto enviar un mensaje indicando que no se envió por X problema
             //this.notificarError(objWa.phone, idTurno, cliente);
-            this.updateEstatusWa(idTurno);
+            this.updateEstatusERROR(idTurno);
           }
 
           // Si el envio fu exitoso
           if (data.responseExSave.id) {
             console.log('El id es: ', idTurno);
-            this.updateEstatus(idTurno);
+            this.updateEstatusOK(idTurno);
           }
         })
       )
@@ -316,7 +316,7 @@ https://wa.me/595214129000`;
   }
 
   // Una vez que el envio haya sido exitoso. Se actualiza el estado del turno en la DB PostgreSQL
-  updateEstatus(idTurno: any) {
+  updateEstatusOK(idTurno: any) {
     // Se crea el objeto turno con el campo estado_envio modificado a 1
     let objTurno = {
       estado_envio: 1,
@@ -333,7 +333,7 @@ https://wa.me/595214129000`;
   }
 
   // Si el envio no fue exitoso se cambia el estado del turno registrado
-  updateEstatusWa(idTurno: any) {
+  updateEstatusERROR(idTurno: any) {
     // Se crea el objeto turno con el campo estado_envio modificado a 3
     let objTurno = {
       estado_envio: 3,
