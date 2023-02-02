@@ -50,11 +50,15 @@ https://wa.me/595214129000`;
   mood = 'Trabajando! 👨🏻‍💻';
   moodNotificado = 0;
 
-  // Numeros a quien notificar su estado
+  // Numeros a quien notificar el estado
   numeros = [
     {
       NOMBRE: 'Alejandro',
       NRO_CEL: '595986153301',
+    },
+    {
+      NOMBRE: 'José',
+      NRO_CEL: '595985604619',
     },
   ];
 
@@ -341,9 +345,9 @@ https://wa.me/595214129000`;
             this.updateEstatusERROR(idTurno);
           }
 
-          // Si el envio fu exitoso
+          // Si el envio fue exitoso
           if (data.responseExSave.id) {
-            console.log('El id es: ', idTurno);
+            console.log('ENVIO CORRECTO id_turno: ', idTurno);
             this.updateEstatusOK(idTurno);
             // Traer la info de la cantidad de envios realizados
             this.getTotaldeEnvios();
