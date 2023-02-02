@@ -54,11 +54,15 @@ https://wa.me/595214129000`;
   numeros = [
     {
       NOMBRE: 'Alejandro',
-      NRO_CEL: '595986153301',
+      NRO_CEL: '595974107341',
     },
     {
       NOMBRE: 'José',
       NRO_CEL: '595985604619',
+    },
+    {
+      NOMBRE: 'Enviador de turnos',
+      NRO_CEL: '595991728244',
     },
   ];
 
@@ -84,7 +88,7 @@ https://wa.me/595214129000`;
         }
         this.mood = 'Durmiendo! 😴';
       }
-    }, 15000 * 60);
+    }, 13000 * 60);
   }
 
   // Get turnos - TurnosEnviador
@@ -466,8 +470,8 @@ https://wa.me/595214129000`;
       // Envia la notificacion a los numeros cargados en el array
       for (let n of this.numeros) {
         let objWa = {
-          message:
-            'Cacho ahora empiezo a laburar! 👨🏻‍💻. Atte: El enviador de turnos.',
+          message: `Cacho ahora empiezo a laburar! 👨🏻‍💻
+          Atte: El Enviador de turnos.`,
           phone: n.NRO_CEL,
           mimeType: '',
           data: '',
@@ -495,7 +499,9 @@ https://wa.me/595214129000`;
       // Envia la notificacion a los numeros cargados en el array
       for (let n of this.numeros) {
         let objWa = {
-          message: 'Cacho ahora off ya! 😴. Atte: El enviador de turnos.',
+          message: `Cacho ahora off ya! 😴
+          Total enviados hoy: `+this.contadorEnvioDiario+`
+          Atte: El Enviador de turnos.`,
           phone: n.NRO_CEL,
           mimeType: '',
           data: '',
