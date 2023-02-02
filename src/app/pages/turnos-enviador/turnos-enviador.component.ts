@@ -45,32 +45,23 @@ https://wa.me/595214129000`;
 
   // Horario laboral del enviador
   horaEntrada = '07:00';
-  horaSalida = '20:50';
+  horaSalida = '20:00';
   mood = 'Trabajando! 👨🏻‍💻';
   moodNotificado = 0;
 
   // Numeros a quien notificar su estado
   numeros = [
     {
-      NOMBRE: 'José',
-      NRO_CEL: '595985604619',
-    },
-    {
       NOMBRE: 'Alejandro',
       NRO_CEL: '595986153301',
-    },
-    {
-      NOMBRE: 'Johanna',
-      NRO_CEL: '595974107341',
-    },
+    }
   ];
 
   // Tiempo de retraso entre envios en milisegundos
-  tiempoRetraso = 5000;
+  tiempoRetraso = 8000;
 
   ngOnInit(): void {
-    //this.getTurnosPendientes();
-    this.getTotaldeEnvios();
+    this.getTurnosPendientes();
 
     setInterval((): void => {
       let hoyAhora = new Date();
@@ -83,7 +74,7 @@ https://wa.me/595214129000`;
         }
         console.log('Trabajando!');
         this.mood = 'Trabajando! 👨🏻‍💻';
-        //this.getTurnosPendientes();
+        this.getTurnosPendientes();
       } else {
         if (this.moodNotificado === 1) {
           this.notificarEstado('Offline');
@@ -91,7 +82,7 @@ https://wa.me/595214129000`;
         console.log('Durmiendo!');
         this.mood = 'Durmiendo! 😴';
       }
-    }, 1000 * 60);
+    }, 15000 * 60);
   }
 
   // Get turnos - TurnosEnviador
@@ -114,7 +105,7 @@ https://wa.me/595214129000`;
             return;
           }
           this.iniciarEnvio();
-          console.log(this.turnos);
+          console.log("Turnos pendientes de notificacion: ", this.turnos);
         })
       )
       .subscribe({
@@ -167,38 +158,38 @@ https://wa.me/595214129000`;
       };
 
       // Se escribe en la tabla de los logs de los envios realizados
-      let outputTable = (<HTMLInputElement>(
-        document.getElementById('outputTable')
-      )).innerHTML;
+      // let outputTable = (<HTMLInputElement>(
+      //   document.getElementById('outputTable')
+      // )).innerHTML;
 
       // Se crea la tabla tipo console log que se muestra en el frontend
-      (<HTMLInputElement>document.getElementById('outputTable')).innerHTML =
-        `<tr>
-        <th scope="row">` +
-        objetoTurno.id +
-        `</th>
-        <td>` +
-        objetoTurno.fecha +
-        `</td>
-        <td>` +
-        objetoTurno.hora +
-        `</td>
-        <td>` +
-        objetoTurno.pro +
-        `</td>
-        <td>` +
-        objetoTurno.suc +
-        `</td>
-        <td>` +
-        objetoTurno.cli +
-        `</td>
-        <td>` +
-        objetoTurno.contacto +
-        `</td>
-        <td>Sí</td>
-        </tr>
-        ` +
-        outputTable;
+      // (<HTMLInputElement>document.getElementById('outputTable')).innerHTML =
+      //   `<tr>
+      //   <th scope="row">` +
+      //   objetoTurno.id +
+      //   `</th>
+      //   <td>` +
+      //   objetoTurno.fecha +
+      //   `</td>
+      //   <td>` +
+      //   objetoTurno.hora +
+      //   `</td>
+      //   <td>` +
+      //   objetoTurno.pro +
+      //   `</td>
+      //   <td>` +
+      //   objetoTurno.suc +
+      //   `</td>
+      //   <td>` +
+      //   objetoTurno.cli +
+      //   `</td>
+      //   <td>` +
+      //   objetoTurno.contacto +
+      //   `</td>
+      //   <td>Sí</td>
+      //   </tr>
+      //   ` +
+      //   outputTable;
 
       // Se crea la variable del ID del turno. para modificar su estado una vez que se envie el mensaje
       let idTurno = t.id_turno;
@@ -321,7 +312,7 @@ https://wa.me/595214129000`;
       fileSize: 0,
     };
     //console.log("Lo que se envia: ", objWa);
-    //this.enviarMensaje(objWa, idTurno, cliente);
+    this.enviarMensaje(objWa, idTurno, cliente);
   }
 
   // Se envia el mensaje atravez de la API de WhatsappWeb
@@ -354,6 +345,7 @@ https://wa.me/595214129000`;
             console.log('El id es: ', idTurno);
             this.updateEstatusOK(idTurno);
             // Traer la info de la cantidad de envios realizados
+            this.getTotaldeEnvios();
           }
         })
       )
