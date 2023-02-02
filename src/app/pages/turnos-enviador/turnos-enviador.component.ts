@@ -38,10 +38,11 @@ https://wa.me/595214129000`;
 
   // Formatear fecha
   pipe = new DatePipe('en-US');
-  // la fecha del envio se toma en la var global por la fecha del sistema
-  hoy = new Date();
-  fechaHoy = this.pipe.transform(this.hoy, 'dd/MM/yyyy HH:mm');
-  horaEjecucion = this.pipe.transform(this.hoy, 'HH:mm');
+
+  // La fecha y hora que se inició el enviador por ultima vez
+  hoyAhora = new Date();
+  fechaEjecucion = this.pipe.transform(this.hoyAhora, 'dd/MM/yyyy HH:mm');
+  fechaEnvio: any = '';
 
   // Horario laboral del enviador
   horaEntrada = '07:00';
@@ -54,7 +55,7 @@ https://wa.me/595214129000`;
     {
       NOMBRE: 'Alejandro',
       NRO_CEL: '595986153301',
-    }
+    },
   ];
 
   // Tiempo de retraso entre envios en milisegundos
@@ -66,20 +67,17 @@ https://wa.me/595214129000`;
     setInterval((): void => {
       let hoyAhora = new Date();
       let horaAhora: any = this.pipe.transform(hoyAhora, 'HH:mm');
-      console.log(horaAhora);
 
       if (horaAhora >= this.horaEntrada && horaAhora <= this.horaSalida) {
         if (this.moodNotificado === 0) {
           this.notificarEstado('Online');
         }
-        console.log('Trabajando!');
         this.mood = 'Trabajando! 👨🏻‍💻';
         this.getTurnosPendientes();
       } else {
         if (this.moodNotificado === 1) {
           this.notificarEstado('Offline');
         }
-        console.log('Durmiendo!');
         this.mood = 'Durmiendo! 😴';
       }
     }, 15000 * 60);
@@ -88,6 +86,9 @@ https://wa.me/595214129000`;
   // Get turnos - TurnosEnviador
   // Solamente los que estan pendiente de envío - API de Turnos
   getTurnosPendientes() {
+    let hoyAhora = new Date();
+    this.fechaEnvio = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
+
     this.api
       .get('turnosPendientes')
       .pipe(
@@ -105,7 +106,7 @@ https://wa.me/595214129000`;
             return;
           }
           this.iniciarEnvio();
-          console.log("Turnos pendientes de notificacion: ", this.turnos);
+          console.log('Turnos pendientes de notificacion: ', this.turnos);
         })
       )
       .subscribe({
@@ -230,7 +231,7 @@ https://wa.me/595214129000`;
         `</p>
 
         <p class="card-text" style="margin: 0px;">` +
-        this.fechaHoy +
+        this.fechaEnvio +
         `</p>
         </div>
         `;
