@@ -61,6 +61,10 @@ https://wa.me/595214129000`;
       NRO_CEL: '595985604619',
     },
     {
+      NOMBRE: 'Johanna',
+      NRO_CEL: '595974503024',
+    },
+    {
       NOMBRE: 'Enviador de turnos',
       NRO_CEL: '595991728244',
     },
@@ -353,8 +357,6 @@ https://wa.me/595214129000`;
           if (data.responseExSave.id) {
             console.log('ENVIO CORRECTO id_turno: ', idTurno);
             this.updateEstatusOK(idTurno);
-            // Traer la info de la cantidad de envios realizados
-            this.getTotaldeEnvios();
           }
         })
       )
@@ -383,6 +385,9 @@ https://wa.me/595214129000`;
         console.log('Error en la consulta PUT ENVIO CORRECTO: ', msg.message);
       },
     });
+
+    // Traer la info de la cantidad de envios realizados
+    this.getTotaldeEnvios();
   }
 
   // Si el envio no fue exitoso se cambia el estado del turno registrado
@@ -499,8 +504,11 @@ https://wa.me/595214129000`;
       // Envia la notificacion a los numeros cargados en el array
       for (let n of this.numeros) {
         let objWa = {
-          message: `Cacho ahora off ya! 😴
-          Total enviados hoy: `+this.contadorEnvioDiario+`
+          message:
+            `Cacho ahora off ya! 😴
+          Total enviados hoy: ` +
+            this.contadorEnvioDiario +
+            `
           Atte: El Enviador de turnos.`,
           phone: n.NRO_CEL,
           mimeType: '',
