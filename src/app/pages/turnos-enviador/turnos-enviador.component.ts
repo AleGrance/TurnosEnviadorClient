@@ -37,17 +37,36 @@ https://wa.me/595214129000`;
   pipe = new DatePipe('en-US');
   // la fecha del envio se toma en la var global por la fecha del sistema
   hoy = new Date();
-  fechaHoy = this.pipe.transform(this.hoy, 'dd/MM/yyyy');
+  fechaHoy = this.pipe.transform(this.hoy, 'dd/MM/yyyy HH:mm');
+  horaEjecucion = this.pipe.transform(this.hoy, 'HH:mm');
+
+  // Horario laboral del enviador
+  horaEntrada = '07:00';
+  horaSalida = '20:00';
+  mood = 'Trabajando! 👨🏻‍💻';
+  moodNotificado = 0;
 
   // Tiempo de retraso entre envios
   tiempoRetraso = 5000;
 
   ngOnInit(): void {
-    this.getTurnosPendientes();
+    //this.getTurnosPendientes();
 
     setInterval((): void => {
-      //this.getTurnosPendientes();
-    }, 10000 * 60);
+      let hoyAhora = new Date();
+      let horaAhora: any = this.pipe.transform(hoyAhora, 'HH:mm');
+      console.log(horaAhora);
+
+      if (horaAhora >= this.horaEntrada && horaAhora <= this.horaSalida) {
+        console.log("Trabajando!");
+        this.mood = 'Trabajando! 👨🏻‍💻';
+        //this.getTurnosPendientes();
+      } else {
+        console.log("Durmiendo!")
+        this.mood = 'Durmiendo! 😴';
+      }
+
+    }, 1000 * 60);
   }
 
   // Get turnos - TurnosEnviador
@@ -273,7 +292,7 @@ https://wa.me/595214129000`;
       fileSize: 0,
     };
     //console.log("Lo que se envia: ", objWa);
-    this.enviarMensaje(objWa, idTurno, cliente);
+    //this.enviarMensaje(objWa, idTurno, cliente);
   }
 
   // Se envia el mensaje atravez de la API de WhatsappWeb
@@ -386,6 +405,11 @@ https://wa.me/595214129000`;
         console.log('Error en la petición POST: ', msg.message);
       },
     });
+  }
+
+  // Notifica el estado del Enviador cada vez que cambie de estado
+  notificarEstado() {
+
   }
 
   showSpinner() {
