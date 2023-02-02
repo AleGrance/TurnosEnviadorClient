@@ -46,7 +46,7 @@ https://wa.me/595214129000`;
     this.getTurnosPendientes();
 
     setInterval((): void => {
-      this.getTurnosPendientes();
+      //this.getTurnosPendientes();
     }, 10000 * 60);
   }
 
@@ -60,6 +60,9 @@ https://wa.me/595214129000`;
           this.turnos = data;
           if (this.turnos.length === 0) {
             console.log('Sin agendamientos pendientes de envio!');
+            this.toastr.warning('Sin agendamientos pendientes de envio!', 'Alerta!', {
+              timeOut: 9000 * 60
+            });
             return;
           }
           this.iniciarEnvio();
