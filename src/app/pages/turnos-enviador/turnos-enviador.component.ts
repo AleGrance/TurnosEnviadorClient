@@ -24,6 +24,8 @@ export class TurnosEnviadorComponent implements OnInit {
   turnos: any = [];
   idTurno = 0;
   cards: any;
+  contadorEnvioDiario = 0;
+  contadorEnvioTotal = 0;
 
   // Datos del Mensaje de whatsapp
   fileMimeTypeMedia = '';
@@ -43,7 +45,7 @@ https://wa.me/595214129000`;
 
   // Horario laboral del enviador
   horaEntrada = '07:00';
-  horaSalida = '12:50';
+  horaSalida = '20:50';
   mood = 'Trabajando! 👨🏻‍💻';
   moodNotificado = 0;
 
@@ -63,11 +65,12 @@ https://wa.me/595214129000`;
     },
   ];
 
-  // Tiempo de retraso entre envios
+  // Tiempo de retraso entre envios en milisegundos
   tiempoRetraso = 5000;
 
   ngOnInit(): void {
     //this.getTurnosPendientes();
+    this.getTotaldeEnvios();
 
     setInterval((): void => {
       let hoyAhora = new Date();
@@ -350,6 +353,7 @@ https://wa.me/595214129000`;
           if (data.responseExSave.id) {
             console.log('El id es: ', idTurno);
             this.updateEstatusOK(idTurno);
+            // Traer la info de la cantidad de envios realizados
           }
         })
       )
@@ -400,6 +404,30 @@ https://wa.me/595214129000`;
     });
   }
 
+  // Traer la cantidad de envios realizados
+  getTotaldeEnvios() {
+    this.api
+      .get('turnosNotificados')
+      .pipe(
+        map((data) => {
+          this.turnos = data;
+          this.contadorEnvioDiario = this.turnos.count;
+        })
+      )
+      .subscribe({
+        // next(result) {
+        //   console.log('Resultado del post: ', result);
+        // },
+        error(msg) {
+          console.log(
+            'Error al traer los turnos turnos NOTIFICADOS: ',
+            msg.message
+          );
+        },
+      });
+  }
+
+  // No funciona - VER DE ARREGLAR
   detenerEnvio() {
     console.log('DETENIDO!');
     this.turnos = [];
@@ -470,8 +498,7 @@ https://wa.me/595214129000`;
       // Envia la notificacion a los numeros cargados en el array
       for (let n of this.numeros) {
         let objWa = {
-          message:
-            'Cacho ahora off ya! 😴. Atte: El enviador de turnos.',
+          message: 'Cacho ahora off ya! 😴. Atte: El enviador de turnos.',
           phone: n.NRO_CEL,
           mimeType: '',
           data: '',
