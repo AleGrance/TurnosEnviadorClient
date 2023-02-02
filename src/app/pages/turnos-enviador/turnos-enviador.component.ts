@@ -31,7 +31,8 @@ export class TurnosEnviadorComponent implements OnInit {
   mensajePie = `Se ha registrado su turno! 😁
 Para cualquier consulta, contáctanos llamando al 0214129000 o escribinos al siguiente link:
 https://wa.me/595214129000`;
-  textoAtencion = 'ATENCIÓN: El turno debe ser Re confirmado con 24Hs de anticipación, en caso de no hacerlo el turno queda disponible para otro paciente. Para Re confirmar: 021-412-9000';
+  textoAtencion =
+    'ATENCIÓN: El turno debe ser Re confirmado con 24Hs de anticipación, en caso de no hacerlo el turno queda disponible para otro paciente. Para Re confirmar: 021-412-9000';
 
   // Formatear fecha
   pipe = new DatePipe('en-US');
@@ -42,9 +43,25 @@ https://wa.me/595214129000`;
 
   // Horario laboral del enviador
   horaEntrada = '07:00';
-  horaSalida = '20:00';
+  horaSalida = '12:50';
   mood = 'Trabajando! 👨🏻‍💻';
   moodNotificado = 0;
+
+  // Numeros a quien notificar su estado
+  numeros = [
+    {
+      NOMBRE: 'José',
+      NRO_CEL: '595985604619',
+    },
+    {
+      NOMBRE: 'Alejandro',
+      NRO_CEL: '595986153301',
+    },
+    {
+      NOMBRE: 'Johanna',
+      NRO_CEL: '595974107341',
+    },
+  ];
 
   // Tiempo de retraso entre envios
   tiempoRetraso = 5000;
@@ -58,14 +75,19 @@ https://wa.me/595214129000`;
       console.log(horaAhora);
 
       if (horaAhora >= this.horaEntrada && horaAhora <= this.horaSalida) {
-        console.log("Trabajando!");
+        if (this.moodNotificado === 0) {
+          this.notificarEstado('Online');
+        }
+        console.log('Trabajando!');
         this.mood = 'Trabajando! 👨🏻‍💻';
         //this.getTurnosPendientes();
       } else {
-        console.log("Durmiendo!")
+        if (this.moodNotificado === 1) {
+          this.notificarEstado('Offline');
+        }
+        console.log('Durmiendo!');
         this.mood = 'Durmiendo! 😴';
       }
-
     }, 1000 * 60);
   }
 
@@ -79,9 +101,13 @@ https://wa.me/595214129000`;
           this.turnos = data;
           if (this.turnos.length === 0) {
             console.log('Sin agendamientos pendientes de envio!');
-            this.toastr.warning('Sin agendamientos pendientes de envio!', 'Alerta!', {
-              timeOut: 9000 * 60
-            });
+            this.toastr.warning(
+              'Sin agendamientos pendientes de envio!',
+              'Alerta!',
+              {
+                timeOut: 9000 * 60,
+              }
+            );
             return;
           }
           this.iniciarEnvio();
@@ -408,8 +434,64 @@ https://wa.me/595214129000`;
   }
 
   // Notifica el estado del Enviador cada vez que cambie de estado
-  notificarEstado() {
+  notificarEstado(estadoActual: any) {
+    if (estadoActual === 'Online' && this.moodNotificado == 0) {
+      console.log('Notifica el estado Online una sola vez');
 
+      // Envia la notificacion a los numeros cargados en el array
+      for (let n of this.numeros) {
+        let objWa = {
+          message:
+            'Cacho ahora empiezo a laburar! 👨🏻‍💻. Atte: El enviador de turnos.',
+          phone: n.NRO_CEL,
+          mimeType: '',
+          data: '',
+          fileName: '',
+          fileSize: 0,
+        };
+
+        this.apiEnviador.post('lead', objWa).subscribe({
+          next(result: any) {
+            console.log('Resultado de la notificación: ', result);
+          },
+          error(msg) {
+            console.log('Error en la petición POST: ', msg.message);
+          },
+        });
+      }
+
+      // Cambia el valor de moodNotificado si se envió el mensaje
+      this.moodNotificado = 1;
+    }
+
+    if (estadoActual === 'Offline' && this.moodNotificado == 1) {
+      console.log('Notifica el estado Offline una sola vez');
+
+      // Envia la notificacion a los numeros cargados en el array
+      for (let n of this.numeros) {
+        let objWa = {
+          message:
+            'Cacho ahora off ya! 😴. Atte: El enviador de turnos.',
+          phone: n.NRO_CEL,
+          mimeType: '',
+          data: '',
+          fileName: '',
+          fileSize: 0,
+        };
+
+        this.apiEnviador.post('lead', objWa).subscribe({
+          next(result: any) {
+            console.log('Resultado de la notificación: ', result);
+          },
+          error(msg) {
+            console.log('Error en la petición POST: ', msg.message);
+          },
+        });
+      }
+
+      // Cambia el valor de moodNotificado si se envió el mensaje
+      this.moodNotificado = 0;
+    }
   }
 
   showSpinner() {
