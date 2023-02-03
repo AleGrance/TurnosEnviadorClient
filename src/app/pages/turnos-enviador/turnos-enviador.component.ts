@@ -477,7 +477,7 @@ https://wa.me/595214129000`;
     let hoyAhora = new Date();
     let fechaEnvioEstado = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
 
-    if (estadoActual === 'Online' && this.moodNotificado == 0) {
+    if (estadoActual === 'Online' && this.moodNotificado === 0) {
       console.log('Notifica el estado Online una sola vez');
 
       // Envia la notificacion a los numeros cargados en el array
@@ -507,7 +507,7 @@ Fecha: `+fechaEnvioEstado+``,
       this.moodNotificado = 1;
     }
 
-    if (estadoActual === 'Offline' && this.moodNotificado == 1) {
+    if (estadoActual === 'Offline' && this.moodNotificado === 1) {
       console.log('Notifica el estado Offline una sola vez');
 
       // Envia la notificacion a los numeros cargados en el array
