@@ -115,7 +115,7 @@ https://wa.me/595214129000`;
             return;
           }
           this.iniciarEnvio();
-          console.log('Turnos pendientes de notificacion: ', this.turnos);
+          console.log('Turnos pendientes de notificacion: ', this.turnos, this.fechaEnvio);
         })
       )
       .subscribe({
