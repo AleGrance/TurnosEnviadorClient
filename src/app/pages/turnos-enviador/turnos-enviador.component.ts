@@ -75,6 +75,8 @@ https://wa.me/595214129000`;
     setInterval((): void => {
       let hoyAhora = new Date();
       let horaAhora: any = this.pipe.transform(hoyAhora, 'HH:mm');
+      let diaHoy = horaAhora.toString().slice(0, 3);
+      console.log("Hoy es: ", diaHoy);
 
       if (horaAhora >= this.horaEntrada && horaAhora <= this.horaSalida) {
         if (this.moodNotificado === 0) {
