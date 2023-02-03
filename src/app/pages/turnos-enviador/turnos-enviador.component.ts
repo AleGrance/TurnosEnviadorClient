@@ -24,7 +24,7 @@ export class TurnosEnviadorComponent implements OnInit {
   turnos: any = [];
   idTurno = 0;
   cards: any;
-  contadorEnvioDiario = 0;
+  contadorEnvioDiario: any = 0;
   contadorEnvioTotal = 0;
 
   // Datos del Mensaje de whatsapp
@@ -61,10 +61,6 @@ https://wa.me/595214129000`;
       NRO_CEL: '595985604619',
     },
     {
-      NOMBRE: 'Johanna',
-      NRO_CEL: '595974503024',
-    },
-    {
       NOMBRE: 'Enviador de turnos',
       NRO_CEL: '595991728244',
     },
@@ -99,6 +95,7 @@ https://wa.me/595214129000`;
   // Solamente los que estan pendiente de envío - API de Turnos
   getTurnosPendientes() {
     let hoyAhora = new Date();
+    // La fecha de envio que se adjunta a la imagen
     this.fechaEnvio = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
 
     this.api
@@ -112,7 +109,7 @@ https://wa.me/595214129000`;
               'Sin agendamientos pendientes de envio!',
               'Alerta!',
               {
-                timeOut: 9000 * 60,
+                timeOut: 10000 * 60,
               }
             );
             return;
@@ -170,6 +167,7 @@ https://wa.me/595214129000`;
         contacto: contacto,
       };
 
+      // ENLENTECE LA RENDERIZACION DE LA IMAGEN AL AGRANDAR LA PAGINA HTML
       // Se escribe en la tabla de los logs de los envios realizados
       // let outputTable = (<HTMLInputElement>(
       //   document.getElementById('outputTable')
@@ -340,7 +338,7 @@ https://wa.me/595214129000`;
           console.log('Este es el objeto retorno POST: ', objetoRetorno);
 
           if (data.responseExSave.unknow) {
-            console.log('Error en este nro: ', objWa.phone);
+            console.log('Error SIN WHATSAPP nro: ', objWa.phone);
             // Se puede auto enviar un mensaje indicando que no se envió por X problema
             //this.notificarError(objWa.phone, idTurno, cliente);
             this.updateEstatusERROR(idTurno);
@@ -377,17 +375,23 @@ https://wa.me/595214129000`;
       estado_envio: 1,
     };
 
-    this.api.put('turnos/' + idTurno, objTurno).subscribe({
-      next(result: any) {
-        console.log('Resultado del PUT ENVIO CORRECTO: ', result);
-      },
+    this.api.put('turnos/' + idTurno, objTurno)
+    .pipe(
+      map((data: any) => {
+        let estatusOk;
+        estatusOk = data;
+        console.log('Se actualiza el estado del envio PUT STATUS OK: ', estatusOk);
+        this.getTotaldeEnvios();
+      })
+    )
+    .subscribe({
+      // next(result: any) {
+      //   console.log('Resultado del PUT ENVIO CORRECTO: ', result);
+      // },
       error(msg) {
-        console.log('Error en la consulta PUT ENVIO CORRECTO: ', msg.message);
+        console.log('Error en actualizar estado PUT STATUS OK: ', msg.message);
       },
     });
-
-    // Traer la info de la cantidad de envios realizados
-    this.getTotaldeEnvios();
   }
 
   // Si el envio no fue exitoso se cambia el estado del turno registrado
@@ -416,8 +420,9 @@ https://wa.me/595214129000`;
       .get('turnosNotificados')
       .pipe(
         map((data) => {
-          this.turnos = data;
-          this.contadorEnvioDiario = this.turnos.count;
+          let contador = data;
+          this.contadorEnvioDiario = contador;
+          console.log("Total de envios Hoy: ", contador);
         })
       )
       .subscribe({
@@ -469,14 +474,18 @@ https://wa.me/595214129000`;
 
   // Notifica el estado del Enviador cada vez que cambie de estado
   notificarEstado(estadoActual: any) {
+    let hoyAhora = new Date();
+    let fechaEnvioEstado = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
+
     if (estadoActual === 'Online' && this.moodNotificado == 0) {
       console.log('Notifica el estado Online una sola vez');
 
       // Envia la notificacion a los numeros cargados en el array
       for (let n of this.numeros) {
         let objWa = {
-          message: `Cacho ahora empiezo a laburar! 👨🏻‍💻
-          Atte: El Enviador de turnos.`,
+          message: `Enviador de turnos iniciado! 👨🏻‍💻
+Atte: El Enviador de turnos.
+Fecha: `+fechaEnvioEstado+``,
           phone: n.NRO_CEL,
           mimeType: '',
           data: '',
@@ -505,11 +514,12 @@ https://wa.me/595214129000`;
       for (let n of this.numeros) {
         let objWa = {
           message:
-            `Cacho ahora off ya! 😴
-          Total enviados hoy: ` +
-            this.contadorEnvioDiario +
-            `
-          Atte: El Enviador de turnos.`,
+            `Enviador de turnos detenido! 😴
+Total enviados hoy: ` +
+this.contadorEnvioDiario +
+`
+Atte: El Enviador de turnos.
+Fecha: `+fechaEnvioEstado+``,
           phone: n.NRO_CEL,
           mimeType: '',
           data: '',
