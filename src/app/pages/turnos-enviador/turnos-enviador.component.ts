@@ -106,6 +106,7 @@ https://wa.me/595214129000`;
         map((data) => {
           this.turnos = data;
           if (this.turnos.length === 0) {
+            this.getTotaldeEnvios();
             console.log('Sin agendamientos pendientes de envio!');
             this.toastr.warning(
               'Sin agendamientos pendientes de envio!',
