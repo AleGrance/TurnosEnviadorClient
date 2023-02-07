@@ -67,7 +67,9 @@ https://wa.me/595214129000`;
   ];
 
   // Tiempo de retraso entre envios en milisegundos
-  tiempoRetraso = 8000;
+  tiempoRetraso = 14000;
+  // Tiempo de retraso entre ejecucion de consulta SQL para obtener los registros de los turnos
+  tiempoRestrasoSQL = 15000 * 60;
 
   ngOnInit(): void {
     this.getTurnosPendientes();
@@ -90,7 +92,7 @@ https://wa.me/595214129000`;
         }
         this.mood = 'Durmiendo! 😴';
       }
-    }, 13000 * 60);
+    }, this.tiempoRestrasoSQL);
   }
 
   // Get turnos - TurnosEnviador
