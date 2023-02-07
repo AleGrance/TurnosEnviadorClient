@@ -78,7 +78,7 @@ https://wa.me/595214129000`;
       let hoyAhora = new Date();
       let horaAhora: any = this.pipe.transform(hoyAhora, 'HH:mm');
       let diaHoy = horaAhora.toString().slice(0, 3);
-      console.log("Hoy es: ", diaHoy);
+      //console.log("Hoy es: ", diaHoy);
 
       if (horaAhora >= this.horaEntrada && horaAhora <= this.horaSalida) {
         if (this.moodNotificado === 0) {
@@ -109,7 +109,7 @@ https://wa.me/595214129000`;
           this.turnos = data;
           if (this.turnos.length === 0) {
             this.getTotaldeEnvios();
-            console.log('Sin agendamientos pendientes de envio!');
+            //console.log('Sin agendamientos pendientes de envio!');
             this.toastr.warning(
               'Sin agendamientos pendientes de envio!',
               'Alerta!',
@@ -120,7 +120,7 @@ https://wa.me/595214129000`;
             return;
           }
           this.iniciarEnvio();
-          console.log('Turnos pendientes de notificacion: ', this.turnos, this.fechaEnvio);
+          //console.log('Turnos pendientes de notificacion: ', this.turnos, this.fechaEnvio);
         })
       )
       .subscribe({
@@ -160,52 +160,6 @@ https://wa.me/595214129000`;
       let nro_cert_cliente = t.NRO_CERT;
       let contacto = t.TELEFONO_MOVIL;
       let id = t.id_turno;
-
-      // Para la tabla en html
-      let objetoTurno = {
-        id: id,
-        fecha: fecha_turno,
-        hora: hora_turno,
-        pro: profesional,
-        suc: sucursal,
-        cli: cliente,
-        contacto: contacto,
-      };
-
-      // ENLENTECE LA RENDERIZACION DE LA IMAGEN AL AGRANDAR LA PAGINA HTML
-      // Se escribe en la tabla de los logs de los envios realizados
-      // let outputTable = (<HTMLInputElement>(
-      //   document.getElementById('outputTable')
-      // )).innerHTML;
-
-      // Se crea la tabla tipo console log que se muestra en el frontend
-      // (<HTMLInputElement>document.getElementById('outputTable')).innerHTML =
-      //   `<tr>
-      //   <th scope="row">` +
-      //   objetoTurno.id +
-      //   `</th>
-      //   <td>` +
-      //   objetoTurno.fecha +
-      //   `</td>
-      //   <td>` +
-      //   objetoTurno.hora +
-      //   `</td>
-      //   <td>` +
-      //   objetoTurno.pro +
-      //   `</td>
-      //   <td>` +
-      //   objetoTurno.suc +
-      //   `</td>
-      //   <td>` +
-      //   objetoTurno.cli +
-      //   `</td>
-      //   <td>` +
-      //   objetoTurno.contacto +
-      //   `</td>
-      //   <td>Sí</td>
-      //   </tr>
-      //   ` +
-      //   outputTable;
 
       // Se crea la variable del ID del turno. para modificar su estado una vez que se envie el mensaje
       let idTurno = t.id_turno;
@@ -260,14 +214,10 @@ https://wa.me/595214129000`;
         this.crearImg(contacto, idTurno, cliente);
       }, 1000);
 
-      //console.log('Crear imagen!', cliente, contacto, idTurno);
-
       // Se llama a la funcion de retraso para ejecutar todo cada 5 segundos
       await this.sleep(this.tiempoRetraso);
     }
     this.turnos = [];
-    //this.hideSpinner();
-    //this.showAviso();
   }
 
   // Se crea la IMAGEN de la tarjeta creada
@@ -340,17 +290,17 @@ https://wa.me/595214129000`;
         map((data: any) => {
           let objetoRetorno;
           objetoRetorno = data;
-          console.log('Este es el objeto retorno POST: ', objetoRetorno);
+          //console.log('Este es el objeto retorno POST: ', objetoRetorno);
 
           if (data.responseExSave.unknow) {
-            console.log('Error SIN WHATSAPP nro: ', objWa.phone);
+            //console.log('Error SIN WHATSAPP nro: ', objWa.phone);
             // Se puede auto enviar un mensaje indicando que no se envió por X problema
             //this.notificarError(objWa.phone, idTurno, cliente);
             this.updateEstatusERROR(idTurno);
           }
 
           if (data.responseExSave.error) {
-            console.log('Error en este nro: ', objWa.phone);
+            //console.log('Error en este nro: ', objWa.phone);
             // Se puede auto enviar un mensaje indicando que no se envió por X problema
             //this.notificarError(objWa.phone, idTurno, cliente);
             this.updateEstatusERROR(idTurno);
@@ -358,7 +308,7 @@ https://wa.me/595214129000`;
 
           // Si el envio fue exitoso
           if (data.responseExSave.id) {
-            console.log('ENVIO CORRECTO id_turno: ', idTurno);
+            //console.log('ENVIO CORRECTO id_turno: ', idTurno);
             this.updateEstatusOK(idTurno);
           }
         })
@@ -368,7 +318,7 @@ https://wa.me/595214129000`;
         //   console.log('Resultado: ', result);
         // },
         error(msg) {
-          console.log('Error en la consulta POST: ', msg.message);
+          //console.log('Error en la consulta POST: ', msg.message);
         },
       });
   }
@@ -385,7 +335,7 @@ https://wa.me/595214129000`;
       map((data: any) => {
         let estatusOk;
         estatusOk = data;
-        console.log('Se actualiza el estado del envio PUT STATUS OK: ', estatusOk);
+        //console.log('Se actualiza el estado del envio PUT STATUS OK: ', estatusOk);
         this.getTotaldeEnvios();
       })
     )
@@ -394,7 +344,7 @@ https://wa.me/595214129000`;
       //   console.log('Resultado del PUT ENVIO CORRECTO: ', result);
       // },
       error(msg) {
-        console.log('Error en actualizar estado PUT STATUS OK: ', msg.message);
+        //console.log('Error en actualizar estado PUT STATUS OK: ', msg.message);
       },
     });
   }
@@ -408,13 +358,13 @@ https://wa.me/595214129000`;
 
     this.api.put('turnos/' + idTurno, objTurno).subscribe({
       next(result: any) {
-        console.log(
-          'Resultado del PUT luego actualizar estado NRO SIN WHATSAPP: ',
-          result
-        );
+        // console.log(
+        //   'Resultado del PUT luego actualizar estado NRO SIN WHATSAPP: ',
+        //   result
+        // );
       },
       error(msg) {
-        console.log('Error en la consulta PUT NRO SIN WHATSAPP: ', msg.message);
+        //console.log('Error en la consulta PUT NRO SIN WHATSAPP: ', msg.message);
       },
     });
   }
@@ -427,7 +377,7 @@ https://wa.me/595214129000`;
         map((data) => {
           let contador = data;
           this.contadorEnvioDiario = contador;
-          console.log("Total de envios Hoy: ", contador);
+          //console.log("Total de envios Hoy: ", contador);
         })
       )
       .subscribe({
@@ -435,17 +385,17 @@ https://wa.me/595214129000`;
         //   console.log('Resultado del post: ', result);
         // },
         error(msg) {
-          console.log(
-            'Error al traer los turnos turnos NOTIFICADOS: ',
-            msg.message
-          );
+          // console.log(
+          //   'Error al traer los turnos turnos NOTIFICADOS: ',
+          //   msg.message
+          // );
         },
       });
   }
 
   // No funciona - VER DE ARREGLAR
   detenerEnvio() {
-    console.log('DETENIDO!');
+    //console.log('DETENIDO!');
     this.turnos = [];
     return;
   }
@@ -469,10 +419,10 @@ https://wa.me/595214129000`;
 
     this.apiEnviador.post('lead', objWa).subscribe({
       next(result: any) {
-        console.log('Resultado de la notificación: ', result);
+        //console.log('Resultado de la notificación: ', result);
       },
       error(msg) {
-        console.log('Error en la petición POST: ', msg.message);
+        //console.log('Error en la petición POST: ', msg.message);
       },
     });
   }
@@ -483,8 +433,6 @@ https://wa.me/595214129000`;
     let fechaEnvioEstado = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
 
     if (estadoActual === 'Online' && this.moodNotificado === 0) {
-      console.log('Notifica el estado Online una sola vez');
-
       // Envia la notificacion a los numeros cargados en el array
       for (let n of this.numeros) {
         let objWa = {
@@ -500,10 +448,10 @@ Fecha: `+fechaEnvioEstado+``,
 
         this.apiEnviador.post('lead', objWa).subscribe({
           next(result: any) {
-            console.log('Resultado de la notificación: ', result);
+            //console.log('Resultado de la notificación: ', result);
           },
           error(msg) {
-            console.log('Error en la petición POST: ', msg.message);
+            //console.log('Error en la petición POST: ', msg.message);
           },
         });
       }
@@ -513,8 +461,6 @@ Fecha: `+fechaEnvioEstado+``,
     }
 
     if (estadoActual === 'Offline' && this.moodNotificado === 1) {
-      console.log('Notifica el estado Offline una sola vez');
-
       // Envia la notificacion a los numeros cargados en el array
       for (let n of this.numeros) {
         let objWa = {
@@ -534,10 +480,10 @@ Fecha: `+fechaEnvioEstado+``,
 
         this.apiEnviador.post('lead', objWa).subscribe({
           next(result: any) {
-            console.log('Resultado de la notificación: ', result);
+            //console.log('Resultado de la notificación: ', result);
           },
           error(msg) {
-            console.log('Error en la petición POST: ', msg.message);
+            //console.log('Error en la petición POST: ', msg.message);
           },
         });
       }
@@ -546,148 +492,4 @@ Fecha: `+fechaEnvioEstado+``,
       this.moodNotificado = 0;
     }
   }
-
-  showSpinner() {
-    (<HTMLInputElement>document.getElementById('spinner')).style.display =
-      'block';
-  }
-
-  hideSpinner() {
-    (<HTMLInputElement>document.getElementById('spinner')).style.display =
-      'none';
-  }
-
-  showAviso() {
-    (<HTMLInputElement>document.getElementById('aviso')).style.display =
-      'block';
-  }
-
-  // Con observables y manejadores de errores
-  // posteo2(objWa: any) {
-  //   // Create an Observable that will start listening to geolocation updates
-  //   // when a consumer subscribes.
-  //   const locations = new Observable((observer) => {
-  //     let watchId: number;
-
-  //     // Simple geolocation API check provides values to publish
-  //     if ('geolocation' in navigator) {
-  //       watchId = navigator.geolocation.watchPosition(
-  //         (position: GeolocationPosition) => {
-  //           observer.next(position);
-  //         },
-  //         (error: GeolocationPositionError) => {
-  //           observer.error(error);
-  //         }
-  //       );
-  //     } else {
-  //       observer.error('Geolocation not available');
-  //     }
-
-  //     // When the consumer unsubscribes, clean up data ready for next subscription.
-  //     return {
-  //       unsubscribe() {
-  //         navigator.geolocation.clearWatch(watchId);
-  //       },
-  //     };
-  //   });
-
-  //   // Call subscribe() to start listening for updates.
-  //   const locationsSubscription = locations.subscribe({
-  //     next(position) {
-  //       console.log('Current Position: ', position);
-  //     },
-  //     error(msg) {
-  //       console.log('Error Getting Location: ', msg);
-  //     },
-  //   });
-
-  //   // Stop listening for location after 10 seconds
-  //   setTimeout(() => {
-  //     locationsSubscription.unsubscribe();
-  //   }, 10000);
-
-  //   // this.api.post('lead', objWa).subscribe(
-  //   //   (result: any) => {console.log(result)}
-  //   //   );
-
-  //   // METODO DEPRECADO
-
-  //   // this.api.post('lead', objeto).subscribe(
-  //   //   (result: any) => {
-  //   //     // Checks if there is an error in the response before continue
-  //   //     if (result.responseExSave.error) {
-  //   //       const errMsg = result.responseExSave.error.slice(0, 17);
-  //   //       //console.log(errMsg);
-
-  //   //       // if (errMsg === 'Escanee el código') {
-  //   //       //   this.toastr.error(
-  //   //       //     result.responseExSave.error +
-  //   //       //       " <a href='./assets/img/qr.svg' target='_blank'>Aqui</a>",
-  //   //       //     'Error',
-  //   //       //     {
-  //   //       //       timeOut: 0,
-  //   //       //       enableHtml: true,
-  //   //       //     }
-  //   //       //   );
-  //   //       //   this.resetFormulario();
-  //   //       //   return;
-  //   //       // }
-
-  //   //       // if (errMsg === 'Protocol error (R') {
-  //   //       //   this.toastr.error(
-  //   //       //     'Se ha cerrado la sesión, inicie nuevamente escaneando el código ' +
-  //   //       //       " <a href='./assets/img/qr.svg' target='_blank'>Aqui</a>" +
-  //   //       //       '. Antes de escanear el código reinicie la aplicación y actualice con F5 la pestaña de la imagen QR.',
-  //   //       //     'Error',
-  //   //       //     {
-  //   //       //       timeOut: 0,
-  //   //       //       enableHtml: true,
-  //   //       //     }
-  //   //       //   );
-  //   //       //   this.resetFormulario();
-  //   //       //   return;
-  //   //       // }
-
-  //   //       // if (errMsg === 'Evaluation failed') {
-  //   //       //   window.alert(
-  //   //       //     'Verificar el numero: ' +
-  //   //       //       this.numeroCliente +
-  //   //       //       ' se ha detenido el envío en este registro'
-  //   //       //   );
-
-  //   //       //   this.toastr.error(result.responseExSave.error, 'Error', {
-  //   //       //     timeOut: 0,
-  //   //       //   });
-  //   //       //   this.resetFormulario();
-  //   //       //   return;
-  //   //       // }
-
-  //   //       // this.toastr.error(result.responseExSave.error, 'Error', {
-  //   //       //   timeOut: 0,
-  //   //       // });
-  //   //       // this.resetFormulario();
-  //   //       return;
-  //   //     }
-
-  //   //     // Se actualiza la vista html si el result retorna un objeto, significa que inserto en la bd. De lo contrario muestra el mensaje de error que retorna el server
-  //   //     if (result.responseExSave.id) {
-  //   //       //this.toastr.success('Mensaje enviado a: ' + this.nombreCliente);
-  //   //       //console.log('Lo que se envia a la API: ', param);
-  //   //       this.index += 1;
-  //   //       this.increaseCounter();
-  //   //       this.changeProgressBar(this.index);
-  //   //       this.enviarTodos();
-  //   //     } else {
-  //   //       //console.log('result post: ', result);
-  //   //       //this.toastr.warning(result);
-  //   //     }
-  //   //     //console.log('La respuesta de la api: ', result.responseExSave);
-  //   //   },
-  //   //   (error) => {
-  //   //     // this.toastr.error(error.message, 'Error', {
-  //   //     //   timeOut: 0,
-  //   //     // });
-  //   //   }
-  //   // );
-  // }
 }
