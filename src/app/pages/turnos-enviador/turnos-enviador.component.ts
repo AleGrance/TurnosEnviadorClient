@@ -61,8 +61,8 @@ https://wa.me/595214129000`;
       NRO_CEL: '595985604619',
     },
     {
-      NOMBRE: 'Enviador de turnos',
-      NRO_CEL: '595991728244',
+      NOMBRE: 'Johanna',
+      NRO_CEL: '595974503024',
     },
   ];
 
