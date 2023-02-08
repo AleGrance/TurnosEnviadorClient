@@ -82,13 +82,13 @@ https://wa.me/595214129000`;
 
       if (horaAhora >= this.horaEntrada && horaAhora <= this.horaSalida) {
         if (this.moodNotificado === 0) {
-          this.notificarEstado('Online');
+          //this.notificarEstado('Online');
         }
         this.mood = 'Trabajando! 👨🏻‍💻';
         this.getTurnosPendientes();
       } else {
         if (this.moodNotificado === 1) {
-          this.notificarEstado('Offline');
+          //this.notificarEstado('Offline');
         }
         this.mood = 'Durmiendo! 😴';
       }
