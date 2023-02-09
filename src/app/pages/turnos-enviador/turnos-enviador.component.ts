@@ -28,6 +28,7 @@ export class TurnosEnviadorComponent implements OnInit {
   contadorEnvioTotal = 0;
 
   // Datos del Mensaje de whatsapp
+  contactoCliente = '';
   fileMimeTypeMedia = '';
   fileBase64Media = '';
   mensajePie = `Se ha registrado su turno! 😁
@@ -155,7 +156,7 @@ https://wa.me/595214129000`;
       let cliente = t.CLIENTE;
       let plan_cliente = t.PLAN_CLIENTE;
       let nro_cert_cliente = t.NRO_CERT;
-      let contacto = t.TELEFONO_MOVIL;
+      this.contactoCliente = t.TELEFONO_MOVIL;
 
       // Se crea la variable del ID del turno. para modificar su estado una vez que se envie el mensaje
       let idTurno = t.id_turno;
@@ -207,8 +208,9 @@ https://wa.me/595214129000`;
 
       // Se retrasa la llamada a la función debido a que el DOM no renderiza de inmediato el logo de odontos
       setTimeout(() => {
-        this.crearImg(contacto, idTurno, cliente);
-      }, 3000);
+        //this.crearImg(contacto, idTurno, cliente);
+        this.crearImg(idTurno);
+      }, 2000);
 
       // Se llama a la funcion de retraso para ejecutar todo cada 15 segundos
       await this.sleep(this.tiempoRetraso);
@@ -217,7 +219,7 @@ https://wa.me/595214129000`;
   }
 
   // Se crea la IMAGEN de la tarjeta creada
-  crearImg(contacto: any, idTurno: any, cliente: any) {
+  crearImg(idTurno: any) {
     let node = <HTMLInputElement>document.getElementById('card');
 
     htmlToImage
@@ -231,7 +233,7 @@ https://wa.me/595214129000`;
         this.fileBase64Media = img.src.split(',')[1];
 
         this.cargarObj(
-          contacto,
+          //contacto,
           idTurno,
           //cliente,
           this.fileBase64Media,
@@ -259,7 +261,7 @@ https://wa.me/595214129000`;
 
   // Se crea el objeto del mensaje con la imagen creada a enviar por la API
   cargarObj(
-    contacto: any,
+    //contacto: any,
     idTurno: any,
     //cliente: any,
     base64: any,
@@ -267,7 +269,7 @@ https://wa.me/595214129000`;
   ) {
     let objWa = {
       message: this.mensajePie,
-      phone: contacto,
+      phone: this.contactoCliente,
       mimeType: mimeType,
       data: base64,
       fileName: '',
@@ -294,6 +296,7 @@ https://wa.me/595214129000`;
             // Se puede auto enviar un mensaje indicando que no se envió por X problema
             //this.notificarError(objWa.phone, idTurno, cliente);
             this.updateEstatusERROR(idTurno);
+            this.contactoCliente = '';
           }
 
           if (data.responseExSave.error) {
@@ -301,12 +304,14 @@ https://wa.me/595214129000`;
             // Se puede auto enviar un mensaje indicando que no se envió por X problema
             //this.notificarError(objWa.phone, idTurno, cliente);
             this.updateEstatusERROR(idTurno);
+            this.contactoCliente = '';
           }
 
           // Si el envio fue exitoso
           if (data.responseExSave.id) {
             //console.log('ENVIO CORRECTO id_turno: ', idTurno);
             this.updateEstatusOK(idTurno);
+            this.contactoCliente = '';
           }
         })
       )
