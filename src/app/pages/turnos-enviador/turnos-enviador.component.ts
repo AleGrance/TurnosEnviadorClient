@@ -70,10 +70,10 @@ https://wa.me/595214129000`;
   // Tiempo de retraso entre envios en milisegundos
   tiempoRetraso = 15000;
   // Tiempo de retraso entre ejecucion de consulta SQL para obtener los registros de los turnos
-  tiempoRestrasoSQL = 15000 * 60;
+  tiempoRestrasoSQL = 55000 * 60;
 
   ngOnInit(): void {
-    //this.getTurnosPendientes();
+    this.getTurnosPendientes();
 
     setInterval((): void => {
       let hoyAhora = new Date();
@@ -122,7 +122,7 @@ https://wa.me/595214129000`;
             return;
           }
           this.iniciarEnvio();
-          //console.log('Turnos pendientes de notificacion: ', this.turnos, this.fechaEnvio);
+          console.log('Turnos pendientes de notificacion: ', this.turnos, this.fechaEnvio);
         })
       )
       .subscribe({
