@@ -72,7 +72,7 @@ https://wa.me/595214129000`;
   tiempoRestrasoSQL = 15000 * 60;
 
   ngOnInit(): void {
-    this.getTurnosPendientes();
+    //this.getTurnosPendientes();
 
     setInterval((): void => {
       let hoyAhora = new Date();
