@@ -67,7 +67,7 @@ https://wa.me/595214129000`;
   ];
 
   // Tiempo de retraso entre envios en milisegundos
-  tiempoRetraso = 14000;
+  tiempoRetraso = 15000;
   // Tiempo de retraso entre ejecucion de consulta SQL para obtener los registros de los turnos
   tiempoRestrasoSQL = 15000 * 60;
 
@@ -86,6 +86,7 @@ https://wa.me/595214129000`;
         }
         this.mood = 'Trabajando! 👨🏻‍💻';
         this.getTurnosPendientes();
+        console.log("GET TURNOS - INICIA LOOP 15s", horaAhora);
       } else {
         if (this.moodNotificado === 1) {
           //this.notificarEstado('Offline');
@@ -145,21 +146,16 @@ https://wa.me/595214129000`;
       this.toastr.warning('Sin turnos por el momento!', 'Alerta!');
     }
 
-    //this.showSpinner();
-
     for (let t of this.turnos) {
-      //let fecha_turno = this.pipe.transform(t.fecha_turno, 'dd/MM/yyyy');
       let fecha_turno = t.FECHA;
       let hora_turno = t.HORA;
       let profesional = t.NOMBRE_COMERCIAL; // Doctor
       let sucursal = t.SUCURSAL;
       let dir_sucursal = t.DIRECCION;
-      //let tel_sucursal = '021-412-9000';
       let cliente = t.CLIENTE;
       let plan_cliente = t.PLAN_CLIENTE;
       let nro_cert_cliente = t.NRO_CERT;
       let contacto = t.TELEFONO_MOVIL;
-      let id = t.id_turno;
 
       // Se crea la variable del ID del turno. para modificar su estado una vez que se envie el mensaje
       let idTurno = t.id_turno;
@@ -212,9 +208,9 @@ https://wa.me/595214129000`;
       // Se retrasa la llamada a la función debido a que el DOM no renderiza de inmediato el logo de odontos
       setTimeout(() => {
         this.crearImg(contacto, idTurno, cliente);
-      }, 1000);
+      }, 3000);
 
-      // Se llama a la funcion de retraso para ejecutar todo cada 5 segundos
+      // Se llama a la funcion de retraso para ejecutar todo cada 15 segundos
       await this.sleep(this.tiempoRetraso);
     }
     this.turnos = [];
@@ -237,7 +233,7 @@ https://wa.me/595214129000`;
         this.cargarObj(
           contacto,
           idTurno,
-          cliente,
+          //cliente,
           this.fileBase64Media,
           this.fileMimeTypeMedia
         );
@@ -265,7 +261,7 @@ https://wa.me/595214129000`;
   cargarObj(
     contacto: any,
     idTurno: any,
-    cliente: any,
+    //cliente: any,
     base64: any,
     mimeType: any
   ) {
@@ -278,11 +274,12 @@ https://wa.me/595214129000`;
       fileSize: 0,
     };
     //console.log("Lo que se envia: ", objWa);
-    this.enviarMensaje(objWa, idTurno, cliente);
+    //this.enviarMensaje(objWa, idTurno, cliente);
+    this.enviarMensaje(objWa, idTurno);
   }
 
   // Se envia el mensaje atravez de la API de WhatsappWeb
-  enviarMensaje(objWa: any, idTurno: any, cliente: any) {
+  enviarMensaje(objWa: any, idTurno: any) {
     //let turnoId = this.idTurno;
     this.apiEnviador
       .post('lead', objWa)
