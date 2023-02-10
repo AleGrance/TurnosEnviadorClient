@@ -74,34 +74,32 @@ https://wa.me/595214129000`;
 
   ngOnInit(): void {
     this.getTurnosPendientes();
-
-    setInterval((): void => {
-      let hoyAhora = new Date();
-      let horaAhora: any = this.pipe.transform(hoyAhora, 'HH:mm');
-      let diaHoy = horaAhora.toString().slice(0, 3);
-      //console.log("Hoy es: ", diaHoy);
-
-      if (horaAhora >= this.horaEntrada && horaAhora <= this.horaSalida) {
-        if (this.moodNotificado === 0) {
-          //this.notificarEstado('Online');
-        }
-        this.mood = 'Trabajando! 👨🏻‍💻';
-        this.getTurnosPendientes();
-        console.log("GET TURNOS - INICIA LOOP 15s", horaAhora);
-      } else {
-        if (this.moodNotificado === 1) {
-          //this.notificarEstado('Offline');
-        }
-        this.mood = 'Durmiendo! 😴';
-      }
-    }, this.tiempoRestrasoSQL);
+    // setInterval((): void => {
+    //   let hoyAhora = new Date();
+    //   let horaAhora: any = this.pipe.transform(hoyAhora, 'HH:mm');
+    //   let diaHoy = horaAhora.toString().slice(0, 3);
+    //   //console.log("Hoy es: ", diaHoy);
+    //   if (horaAhora >= this.horaEntrada && horaAhora <= this.horaSalida) {
+    //     if (this.moodNotificado === 0) {
+    //       //this.notificarEstado('Online');
+    //     }
+    //     this.mood = 'Trabajando! 👨🏻‍💻';
+    //     this.getTurnosPendientes();
+    //     console.log("GET TURNOS - INICIA LOOP 15s", horaAhora);
+    //   } else {
+    //     if (this.moodNotificado === 1) {
+    //       //this.notificarEstado('Offline');
+    //     }
+    //     this.mood = 'Durmiendo! 😴';
+    //   }
+    // }, this.tiempoRestrasoSQL);
   }
 
   // Get turnos - TurnosEnviador
   // Solamente los que estan pendiente de envío - API de Turnos
   getTurnosPendientes() {
     let hoyAhora = new Date();
-    // La fecha de envio que se adjunta a la imagen
+    // La fecha y hora que se traen los datos del PSQL
     this.fechaEnvio = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
 
     this.api
@@ -111,7 +109,6 @@ https://wa.me/595214129000`;
           this.turnos = data;
           if (this.turnos.length === 0) {
             this.getTotaldeEnvios();
-            //console.log('Sin agendamientos pendientes de envio!');
             this.toastr.warning(
               'Sin agendamientos pendientes de envio!',
               'Alerta!',
@@ -119,10 +116,20 @@ https://wa.me/595214129000`;
                 timeOut: 10000 * 60,
               }
             );
-            return;
+
+            //Si no hay turnos nuevos cargados en el PSQL se vuelve a llamar al for luego de 15 seg
+            setTimeout(() => {
+              this.iniciarEnvio();
+            }, 15000);
           }
+          // Si hay turnos nuevos se llama al for
           this.iniciarEnvio();
-          console.log('Turnos pendientes de notificacion: ', this.turnos, this.fechaEnvio);
+
+          console.log(
+            'Turnos pendientes de notificacion: ',
+            this.turnos,
+            this.fechaEnvio
+          );
         })
       )
       .subscribe({
@@ -216,6 +223,7 @@ https://wa.me/595214129000`;
       await this.sleep(this.tiempoRetraso);
     }
     this.turnos = [];
+    this.getTotaldeEnvios();
   }
 
   // Se crea la IMAGEN de la tarjeta creada
@@ -332,23 +340,24 @@ https://wa.me/595214129000`;
       estado_envio: 1,
     };
 
-    this.api.put('turnos/' + idTurno, objTurno)
-    .pipe(
-      map((data: any) => {
-        let estatusOk;
-        estatusOk = data;
-        //console.log('Se actualiza el estado del envio PUT STATUS OK: ', estatusOk);
-        this.getTotaldeEnvios();
-      })
-    )
-    .subscribe({
-      // next(result: any) {
-      //   console.log('Resultado del PUT ENVIO CORRECTO: ', result);
-      // },
-      error(msg) {
-        //console.log('Error en actualizar estado PUT STATUS OK: ', msg.message);
-      },
-    });
+    this.api
+      .put('turnos/' + idTurno, objTurno)
+      .pipe(
+        map((data: any) => {
+          let estatusOk;
+          estatusOk = data;
+          //console.log('Se actualiza el estado del envio PUT STATUS OK: ', estatusOk);
+          this.getTotaldeEnvios();
+        })
+      )
+      .subscribe({
+        // next(result: any) {
+        //   console.log('Resultado del PUT ENVIO CORRECTO: ', result);
+        // },
+        error(msg) {
+          //console.log('Error en actualizar estado PUT STATUS OK: ', msg.message);
+        },
+      });
   }
 
   // Si el envio no fue exitoso se cambia el estado del turno registrado
@@ -438,9 +447,12 @@ https://wa.me/595214129000`;
       // Envia la notificacion a los numeros cargados en el array
       for (let n of this.numeros) {
         let objWa = {
-          message: `Enviador de turnos iniciado! 👨🏻‍💻
+          message:
+            `Enviador de turnos iniciado! 👨🏻‍💻
 Atte: El Enviador de turnos.
-Fecha: `+fechaEnvioEstado+``,
+Fecha: ` +
+            fechaEnvioEstado +
+            ``,
           phone: n.NRO_CEL,
           mimeType: '',
           data: '',
@@ -469,10 +481,12 @@ Fecha: `+fechaEnvioEstado+``,
           message:
             `Enviador de turnos detenido! 😴
 Total enviados hoy: ` +
-this.contadorEnvioDiario +
-`
+            this.contadorEnvioDiario +
+            `
 Atte: El Enviador de turnos.
-Fecha: `+fechaEnvioEstado+``,
+Fecha: ` +
+            fechaEnvioEstado +
+            ``,
           phone: n.NRO_CEL,
           mimeType: '',
           data: '',
@@ -494,4 +508,51 @@ Fecha: `+fechaEnvioEstado+``,
       this.moodNotificado = 0;
     }
   }
+
+  // async bucle() {
+  //   let array: object[] = [];
+
+  //   for (let a of array) {
+  //     await this.funcionPromesa(a);
+  //   }
+
+  //   console.log('fin del bucle');
+  //   this.getTurnosPendientes();
+  // }
+
+  // funcionPromesa = (a: any) =>
+  //   new Promise((resolve, reject) => {
+  //     console.log('Funcion promesa! ', a);
+  //     return resolve('Hola');
+  //   })
+  //     .then(this.funcionUno)
+  //     .then(this.funcionDos)
+  //     .then(this.funcionTres)
+  //     .then(this.funcionCuatro);
+
+  // funcionUno() {
+  //   let hoy = new Date();
+  //   console.log('UNO', hoy.getSeconds());
+  // }
+
+  // async funcionDos() {
+  //   let retraso = () => new Promise((r) => setTimeout(r, 2000));
+  //   let array = [21, 22, 23, 24, 25];
+
+  //   for (let a of array) {
+  //     console.log(a);
+  //     await retraso();
+  //   }
+  //   console.log('DOS despues del for');
+  // }
+
+  // funcionTres() {
+  //   let hoy = new Date();
+  //   console.log('TRES', hoy.getSeconds());
+  // }
+
+  // funcionCuatro() {
+  //   let hoy = new Date();
+  //   console.log('CUATRO', hoy.getSeconds());
+  // }
 }
