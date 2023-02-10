@@ -43,7 +43,6 @@ https://wa.me/595214129000`;
   // La fecha y hora que se inició el enviador por ultima vez
   hoyAhora = new Date();
   fechaEjecucion = this.pipe.transform(this.hoyAhora, 'dd/MM/yyyy HH:mm');
-  fechaEnvio: any = '';
 
   // Horario laboral del enviador
   horaEntrada = '07:00';
@@ -152,7 +151,7 @@ https://wa.me/595214129000`;
   async iniciarEnvio() {
     // La fecha y hora que se traen los datos del PSQL
     let hoyAhora = new Date();
-    this.fechaEnvio = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
+    let fechaEnvio = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
 
     if (this.turnos.length === 0) {
       this.toastr.warning('Sin turnos por el momento!', 'Alerta!');
@@ -208,7 +207,7 @@ https://wa.me/595214129000`;
         `</p>
 
         <p class="card-text" style="margin: 0px;">` +
-        this.fechaEnvio +
+        fechaEnvio +
         `</p>
         </div>
         `;
