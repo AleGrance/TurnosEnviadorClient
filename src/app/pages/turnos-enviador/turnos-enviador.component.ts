@@ -98,9 +98,9 @@ https://wa.me/595214129000`;
   // Get turnos - TurnosEnviador
   // Solamente los que estan pendiente de envío - API de Turnos
   getTurnosPendientes() {
-    let hoyAhora = new Date();
     // La fecha y hora que se traen los datos del PSQL
-    this.fechaEnvio = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
+    let hoyAhora = new Date();
+    let fechaGetTurnos = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
 
     this.api
       .get('turnosPendientes')
@@ -128,7 +128,7 @@ https://wa.me/595214129000`;
           console.log(
             'Turnos pendientes de notificacion: ',
             this.turnos,
-            this.fechaEnvio
+            fechaGetTurnos
           );
         })
       )
@@ -150,6 +150,10 @@ https://wa.me/595214129000`;
   sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
   async iniciarEnvio() {
+    // La fecha y hora que se traen los datos del PSQL
+    let hoyAhora = new Date();
+    this.fechaEnvio = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
+
     if (this.turnos.length === 0) {
       this.toastr.warning('Sin turnos por el momento!', 'Alerta!');
     }
