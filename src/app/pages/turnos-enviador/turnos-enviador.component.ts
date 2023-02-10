@@ -149,15 +149,19 @@ https://wa.me/595214129000`;
   sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
   async iniciarEnvio() {
-    // La fecha y hora que se traen los datos del PSQL
+    // La fecha y hora que se envia el mensaje
     let hoyAhora = new Date();
-    let fechaEnvio = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
+    let fechaFinFor = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
 
     if (this.turnos.length === 0) {
       this.toastr.warning('Sin turnos por el momento!', 'Alerta!');
     }
 
     for (let t of this.turnos) {
+      // La fecha y hora que se envia el mensaje
+      let hoyAhora = new Date();
+      let fechaEnvio = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
+
       let fecha_turno = t.FECHA;
       let hora_turno = t.HORA;
       let profesional = t.NOMBRE_COMERCIAL; // Doctor
@@ -226,6 +230,7 @@ https://wa.me/595214129000`;
       await this.sleep(this.tiempoRetraso);
     }
     this.turnos = [];
+    console.log('fin del for - inicio getTurnos', fechaFinFor);
     this.getTotaldeEnvios();
   }
 
