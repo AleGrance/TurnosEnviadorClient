@@ -24,6 +24,8 @@ export class TurnosEnviadorComponent implements OnInit {
   turnos: any = [];
   idTurno = 0;
   cards: any;
+
+  // Contadores
   contadorEnvioDiario: any = 0;
   contadorEnvioTotal = 0;
 
@@ -36,6 +38,7 @@ Para cualquier consulta, contáctanos llamando al 0214129000 o escribinos al sig
 https://wa.me/595214129000`;
   textoAtencion =
     'ATENCIÓN: El turno debe ser Re confirmado con 24Hs de anticipación, en caso de no hacerlo el turno queda disponible para otro paciente. Para Re confirmar: 021-412-9000';
+  objWa = {};
 
   // Formatear fecha
   pipe = new DatePipe('en-US');
@@ -72,7 +75,7 @@ https://wa.me/595214129000`;
   tiempoRestrasoSQL = 55000 * 60;
 
   ngOnInit(): void {
-    this.getTurnosPendientes();
+    //this.getTurnosPendientes();
     // setInterval((): void => {
     //   let hoyAhora = new Date();
     //   let horaAhora: any = this.pipe.transform(hoyAhora, 'HH:mm');
@@ -145,8 +148,100 @@ https://wa.me/595214129000`;
       });
   }
 
+  // --- OLD ---
+
   // Funcion de retraso para el for()
-  sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  // sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  // async iniciarEnvio() {
+  //   // La fecha y hora que se envia el mensaje
+  //   let hoyAhora = new Date();
+  //   let fechaFinFor = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
+
+  //   if (this.turnos.length === 0) {
+  //     this.toastr.warning('Sin turnos por el momento!', 'Alerta!');
+  //   }
+
+  //   for (let t of this.turnos) {
+  //     // La fecha y hora que se envia el mensaje
+  //     let hoyAhora = new Date();
+  //     let fechaEnvio = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
+
+  //     let fecha_turno = t.FECHA;
+  //     let hora_turno = t.HORA;
+  //     let profesional = t.NOMBRE_COMERCIAL; // Doctor
+  //     let sucursal = t.SUCURSAL;
+  //     let dir_sucursal = t.DIRECCION;
+  //     let cliente = t.CLIENTE;
+  //     let plan_cliente = t.PLAN_CLIENTE;
+  //     let nro_cert_cliente = t.NRO_CERT;
+  //     this.contactoCliente = t.TELEFONO_MOVIL;
+
+  //     // Se crea la variable del ID del turno. para modificar su estado una vez que se envie el mensaje
+  //     let idTurno = t.id_turno;
+
+  //     // Aca se forma la tarjeta con los datos del turno
+  //     this.cards =
+  //       `
+  //       <img class="card-img-top" src="../../../assets/img/odontos.svg" alt="Card image cap" id="imagen">
+  //       <div class="card-body" id="card-body" style="background-color: white;">
+  //         <h6 class="card-title">` +
+  //       cliente +
+  //       `</h6>
+  //       <p class="card-text" style="margin-bottom: 0px">` +
+  //       plan_cliente +
+  //       `</p>
+  //       <p class="card-text" style="margin-top: 0px; margin-bottom: 2px">` +
+  //       nro_cert_cliente +
+  //       `</p>
+  //             <h5 class="card-title" style="margin: 0px;">Fecha: ` +
+  //       fecha_turno +
+  //       `</h5>
+  //             <h5 class="card-title" style="margin-top: 0px;">Hora: ` +
+  //       hora_turno +
+  //       `</h5>
+  //             <h6 class="card-subtitle mb-2 text-muted">Sucursal: ` +
+  //       sucursal +
+  //       `</h6>
+  //       <p class="card-text" style="margin-top: 0px;"><small class="text-muted">` +
+  //       dir_sucursal +
+  //       `</small></p>
+
+  //             <h6 class="card-subtitle mb-2 text-muted">` +
+  //       profesional +
+  //       `</h6>
+
+  //       <p class="card-text" style="margin-bottom: 2px">` +
+  //       this.textoAtencion +
+  //       `</p>
+
+  //       <p class="card-text" style="margin: 0px;">` +
+  //       fechaEnvio +
+  //       `</p>
+  //       </div>
+  //       `;
+
+  //     // Aca se escribe en el DOM
+  //     (<HTMLInputElement>document.getElementById('card')).innerHTML =
+  //       this.cards;
+
+  //     // Se retrasa la llamada a la función debido a que el DOM no renderiza de inmediato el logo de odontos
+  //     setTimeout(() => {
+  //       //this.crearImg(contacto, idTurno, cliente);
+  //       this.crearImg(idTurno);
+  //     }, 2000);
+
+  //     // Se llama a la funcion de retraso para ejecutar todo cada 15 segundos
+  //     await this.sleep(this.tiempoRetraso);
+  //   }
+  //   this.turnos = [];
+  //   console.log('fin del for - inicio getTurnos', fechaFinFor);
+  //   this.getTotaldeEnvios();
+  // }
+
+  // --- OLD ---
+
+  //---PROMESAS
 
   async iniciarEnvio() {
     // La fecha y hora que se envia el mensaje
@@ -173,7 +268,7 @@ https://wa.me/595214129000`;
       this.contactoCliente = t.TELEFONO_MOVIL;
 
       // Se crea la variable del ID del turno. para modificar su estado una vez que se envie el mensaje
-      let idTurno = t.id_turno;
+      this.idTurno = t.id_turno;
 
       // Aca se forma la tarjeta con los datos del turno
       this.cards =
@@ -220,114 +315,91 @@ https://wa.me/595214129000`;
       (<HTMLInputElement>document.getElementById('card')).innerHTML =
         this.cards;
 
-      // Se retrasa la llamada a la función debido a que el DOM no renderiza de inmediato el logo de odontos
-      setTimeout(() => {
-        //this.crearImg(contacto, idTurno, cliente);
-        this.crearImg(idTurno);
-      }, 2000);
-
-      // Se llama a la funcion de retraso para ejecutar todo cada 15 segundos
-      await this.sleep(this.tiempoRetraso);
+      await this.crearImg();
     }
-    this.turnos = [];
     console.log('fin del for - inicio getTurnos', fechaFinFor);
+    this.turnos = [];
     this.getTotaldeEnvios();
   }
 
+  //---PROMESAS
+
   // Se crea la IMAGEN de la tarjeta creada
-  crearImg(idTurno: any) {
-    let node = <HTMLInputElement>document.getElementById('card');
+  crearImg = () =>
+    new Promise(() => {
+      let node = <HTMLInputElement>document.getElementById('card');
 
-    htmlToImage
-      .toJpeg(node)
-      .then((dataUrl) => {
-        var img = new Image();
-        img.src = dataUrl;
+      htmlToImage
+        .toJpeg(node)
+        .then((dataUrl) => {
+          var img = new Image();
+          img.src = dataUrl;
 
-        this.fileMimeTypeMedia = img.src.split(';base64,')[0];
-        this.fileMimeTypeMedia = this.fileMimeTypeMedia.slice(5);
-        this.fileBase64Media = img.src.split(',')[1];
-
-        this.cargarObj(
-          //contacto,
-          idTurno,
-          //cliente,
-          this.fileBase64Media,
-          this.fileMimeTypeMedia
-        );
-      })
-      .catch(function (error) {
-        console.error('Error al crear la imagen!', error);
-      });
-
-    // Descargar imagen en JPEG
-    // let image = <HTMLInputElement>document.getElementById('card');
-
-    // htmlToImage
-    //   .toJpeg(image, {
-    //     quality: 0.95,
-    //   })
-    //   .then(function (dataUrl) {
-    //     var link = document.createElement('a');
-    //     link.download = cliente + '.jpeg';
-    //     link.href = dataUrl;
-    //     link.click();
-    //   });
-  }
+          this.fileMimeTypeMedia = img.src.split(';base64,')[0];
+          this.fileMimeTypeMedia = this.fileMimeTypeMedia.slice(5);
+          this.fileBase64Media = img.src.split(',')[1];
+        })
+        .catch(function (error) {
+          console.error('Error al crear la imagen!', error);
+        });
+    })
+      .then(this.cargarObj)
+      .then(this.enviarMensaje)
+      .then()
+      .then();
 
   // Se crea el objeto del mensaje con la imagen creada a enviar por la API
-  cargarObj(
-    //contacto: any,
-    idTurno: any,
-    //cliente: any,
-    base64: any,
-    mimeType: any
-  ) {
-    let objWa = {
+  cargarObj() {
+    this.objWa = {
       message: this.mensajePie,
       phone: this.contactoCliente,
-      mimeType: mimeType,
-      data: base64,
+      mimeType: this.fileMimeTypeMedia,
+      data: this.fileBase64Media,
       fileName: '',
       fileSize: 0,
     };
-    //console.log("Lo que se envia: ", objWa);
-    //this.enviarMensaje(objWa, idTurno, cliente);
-    this.enviarMensaje(objWa, idTurno);
   }
 
   // Se envia el mensaje atravez de la API de WhatsappWeb
-  enviarMensaje(objWa: any, idTurno: any) {
+  enviarMensaje() {
     //let turnoId = this.idTurno;
     this.apiEnviador
-      .post('lead', objWa)
+      .post('lead', this.objWa)
       .pipe(
         map((data: any) => {
           let objetoRetorno;
           objetoRetorno = data;
-          //console.log('Este es el objeto retorno POST: ', objetoRetorno);
 
           if (data.responseExSave.unknow) {
             //console.log('Error SIN WHATSAPP nro: ', objWa.phone);
             // Se puede auto enviar un mensaje indicando que no se envió por X problema
             //this.notificarError(objWa.phone, idTurno, cliente);
-            this.updateEstatusERROR(idTurno);
+            this.updateEstatusERROR(this.idTurno);
             this.contactoCliente = '';
+            this.fileBase64Media = '';
+            this.fileMimeTypeMedia = '';
+            this.objWa = '';
           }
 
           if (data.responseExSave.error) {
             //console.log('Error en este nro: ', objWa.phone);
             // Se puede auto enviar un mensaje indicando que no se envió por X problema
             //this.notificarError(objWa.phone, idTurno, cliente);
-            this.updateEstatusERROR(idTurno);
+            this.updateEstatusERROR(this.idTurno);
             this.contactoCliente = '';
+            this.fileBase64Media = '';
+            this.fileMimeTypeMedia = '';
+            this.objWa = '';
           }
 
           // Si el envio fue exitoso
           if (data.responseExSave.id) {
             //console.log('ENVIO CORRECTO id_turno: ', idTurno);
-            this.updateEstatusOK(idTurno);
+            this.updateEstatusOK(this.idTurno);
             this.contactoCliente = '';
+            this.fileBase64Media = '';
+            this.fileMimeTypeMedia = '';
+            this.objWa = '';
           }
         })
       )
