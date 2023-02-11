@@ -75,7 +75,7 @@ https://wa.me/595214129000`;
   tiempoRestrasoSQL = 55000 * 60;
 
   ngOnInit(): void {
-    //this.getTurnosPendientes();
+    this.getTurnosPendientes();
     // setInterval((): void => {
     //   let hoyAhora = new Date();
     //   let horaAhora: any = this.pipe.transform(hoyAhora, 'HH:mm');
@@ -319,7 +319,11 @@ https://wa.me/595214129000`;
     }
     console.log('fin del for - inicio getTurnos', fechaFinFor);
     this.turnos = [];
-    this.getTotaldeEnvios();
+
+    setTimeout(() => {
+      console.log("Se ejecuta getTurnos 5s after");
+      this.getTotaldeEnvios();
+    }, 5000);
   }
 
   //---PROMESAS
@@ -345,8 +349,9 @@ https://wa.me/595214129000`;
     })
       .then(this.cargarObj)
       .then(this.enviarMensaje)
-      .then()
-      .then();
+      .catch((err) => {
+        console.log('CATCH ERR: ', err);
+      });
 
   // Se crea el objeto del mensaje con la imagen creada a enviar por la API
   cargarObj() {
@@ -367,9 +372,6 @@ https://wa.me/595214129000`;
       .post('lead', this.objWa)
       .pipe(
         map((data: any) => {
-          let objetoRetorno;
-          objetoRetorno = data;
-
           if (data.responseExSave.unknow) {
             //console.log('Error SIN WHATSAPP nro: ', objWa.phone);
             // Se puede auto enviar un mensaje indicando que no se envió por X problema
@@ -414,31 +416,32 @@ https://wa.me/595214129000`;
   }
 
   // Una vez que el envio haya sido exitoso. Se actualiza el estado del turno en la DB PostgreSQL
-  updateEstatusOK(idTurno: any) {
-    // Se crea el objeto turno con el campo estado_envio modificado a 1
-    let objTurno = {
-      estado_envio: 1,
-    };
+  updateEstatusOK = (idTurno: any) =>
+    new Promise(() => {
+      // Se crea el objeto turno con el campo estado_envio modificado a 1
+      let objTurno = {
+        estado_envio: 1,
+      };
 
-    this.api
-      .put('turnos/' + idTurno, objTurno)
-      .pipe(
-        map((data: any) => {
-          let estatusOk;
-          estatusOk = data;
-          //console.log('Se actualiza el estado del envio PUT STATUS OK: ', estatusOk);
-          this.getTotaldeEnvios();
-        })
-      )
-      .subscribe({
-        // next(result: any) {
-        //   console.log('Resultado del PUT ENVIO CORRECTO: ', result);
-        // },
-        error(msg) {
-          //console.log('Error en actualizar estado PUT STATUS OK: ', msg.message);
-        },
-      });
-  }
+      this.api
+        .put('turnos/' + idTurno, objTurno)
+        .pipe(
+          map((data: any) => {
+            let estatusOk;
+            estatusOk = data;
+            console.log('Se actualizó el estado PUT STATUS OK: ', estatusOk);
+            this.getTotaldeEnvios();
+          })
+        )
+        .subscribe({
+          // next(result: any) {
+          //   console.log('Resultado del PUT ENVIO CORRECTO: ', result);
+          // },
+          error(msg) {
+            //console.log('Error en actualizar estado PUT STATUS OK: ', msg.message);
+          },
+        });
+    });
 
   // Si el envio no fue exitoso se cambia el estado del turno registrado
   updateEstatusERROR(idTurno: any) {
@@ -482,13 +485,6 @@ https://wa.me/595214129000`;
           // );
         },
       });
-  }
-
-  // No funciona - VER DE ARREGLAR
-  detenerEnvio() {
-    //console.log('DETENIDO!');
-    this.turnos = [];
-    return;
   }
 
   // En caso de tener error en el envio de agendamiento de turno al cliente, se le notifica al numero vinculado con los datos del cliente
