@@ -72,7 +72,7 @@ https://wa.me/595214129000`;
   // Tiempo de retraso entre envios de mensajes 15s
   tiempoRetraso = 15000;
   // Tiempo de retraso entre ejecucion de consulta al PSQL cuando no hay turnos pendientes 1min
-  tiempoRetrasoPSQL = 1000 * 60;
+  tiempoRetrasoPSQL = 2000 * 60;
 
   ngOnInit(): void {
     this.getTurnosPendientes();
