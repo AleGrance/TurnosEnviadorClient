@@ -72,7 +72,7 @@ https://wa.me/595214129000`;
   // Tiempo de retraso entre envios de mensajes 15s
   tiempoRetraso = 15000;
   // Tiempo de retraso entre ejecucion de consulta al PSQL cuando no hay turnos pendientes 1min
-  tiempoRetrasoPSQL = 2000 * 60;
+  tiempoRetrasoPSQL = 1000 * 60;
 
   ngOnInit(): void {
     this.getTurnosPendientes();
@@ -347,6 +347,10 @@ https://wa.me/595214129000`;
             // Indica que se cerró la sesion o la ventana. Envios se iniciar al abrir la sesion o la ventana
             if (errMsg === 'Protocol error (R') {
               this.updateEstatusERROR(idTurno, 105);
+            }
+            // Indica que el campo nro esta mal escrito
+            if (errMsg === 'Evaluation failed') {
+              this.updateEstatusERROR(idTurno, 106);
             }
             this.contactoCliente = '';
           }
