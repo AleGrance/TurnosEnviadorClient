@@ -170,7 +170,7 @@ https://wa.me/595214129000`;
 
     if (this.turnos.length === 0) {
       this.toastr.info('Sin turnos por el momento!', 'Iniciar Envios!', {
-        timeOut: 6000,
+        timeOut: 1000,
         progressBar: true,
       });
     }
@@ -250,9 +250,13 @@ https://wa.me/595214129000`;
     //console.log('fin del for - inicio getTurnos', fechaFinFor);
     this.turnos = [];
     // Al finalizar el for se vuelve a consultar al PSQL por los sgts turnos con estado = 0
+    this.toastr.info('Consultando nuevos turnos...', 'Finalizo el envío!', {
+      timeOut: 1000 * 60,
+      progressBar: true,
+    });
     setTimeout(() => {
       this.getTurnosPendientes();
-    }, 6000);
+    }, 1000 * 60);
   }
 
   // Se crea la IMAGEN de la tarjeta creada
