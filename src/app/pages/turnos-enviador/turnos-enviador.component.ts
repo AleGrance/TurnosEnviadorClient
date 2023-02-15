@@ -176,18 +176,20 @@ https://wa.me/595214129000`;
     }
 
     for (let t of this.turnos) {
+      (<HTMLInputElement>document.getElementById('card')).innerHTML = ''
       // La fecha y hora que se envia el mensaje
       let hoyAhora = new Date();
       let fechaEnvio = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
 
-      let fecha_turno = t.FECHA;
-      let hora_turno = t.HORA;
-      let profesional = t.NOMBRE_COMERCIAL; // Doctor
-      let sucursal = t.SUCURSAL;
-      let dir_sucursal = t.DIRECCION;
-      let cliente = t.CLIENTE;
-      let plan_cliente = t.PLAN_CLIENTE;
-      let nro_cert_cliente = t.NRO_CERT;
+      // let fecha_turno = t.FECHA;
+      // let hora_turno = t.HORA;
+      // let profesional = t.NOMBRE_COMERCIAL; // Doctor
+      // let sucursal = t.SUCURSAL;
+      // let dir_sucursal = t.DIRECCION;
+      // let cliente = t.CLIENTE;
+      // let plan_cliente = t.PLAN_CLIENTE;
+      // let nro_cert_cliente = t.NRO_CERT;
+
       this.contactoCliente = t.TELEFONO_MOVIL;
 
       // Se crea la variable del ID del turno. para modificar su estado una vez que se envie el mensaje
@@ -199,29 +201,29 @@ https://wa.me/595214129000`;
         <img class="card-img-top" src="../../../assets/img/odontos.svg" alt="Card image cap" id="imagen">
         <div class="card-body" id="card-body" style="background-color: white;">
           <h6 class="card-title">` +
-        cliente +
+        t.CLIENTE +
         `</h6>
         <p class="card-text" style="margin-bottom: 0px">` +
-        plan_cliente +
+        t.PLAN_CLIENTE +
         `</p>
         <p class="card-text" style="margin-top: 0px; margin-bottom: 2px">` +
-        nro_cert_cliente +
+        t.NRO_CERT +
         `</p>
               <h5 class="card-title" style="margin: 0px;">Fecha: ` +
-        fecha_turno +
+        t.FECHA +
         `</h5>
               <h5 class="card-title" style="margin-top: 0px;">Hora: ` +
-        hora_turno +
+        t.HORA +
         `</h5>
               <h6 class="card-subtitle mb-2 text-muted">Sucursal: ` +
-        sucursal +
+        t.SUCURSAL +
         `</h6>
         <p class="card-text" style="margin-top: 0px;"><small class="text-muted">` +
-        dir_sucursal +
+        t.DIRECCION +
         `</small></p>
 
               <h6 class="card-subtitle mb-2 text-muted">` +
-        profesional +
+        t.NOMBRE_COMERCIAL +
         `</h6>
 
         <p class="card-text" style="margin-bottom: 2px">` +
@@ -323,6 +325,7 @@ https://wa.me/595214129000`;
 
   // Se envia el mensaje atravez de la API de WhatsappWeb
   enviarMensaje(objWa: any, idTurno: any) {
+    (<HTMLInputElement>document.getElementById('card')).innerHTML = ''
     //let turnoId = this.idTurno;
     this.apiEnviador
       .post('lead', objWa)
