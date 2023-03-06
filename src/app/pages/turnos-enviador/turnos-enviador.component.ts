@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { ApiService } from 'src/app/services/api.service';
 import { DatePipe } from '@angular/common';
 import { map } from 'rxjs/operators';
-import { Toast, ToastrService } from 'ngx-toastr';
-// APIs
-import { ApienviadorService } from 'src/app/services/apienviador.service';
-import { ApiService } from 'src/app/services/api.service';
-// Img
+// img
 import * as htmlToImage from 'html-to-image';
 import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 import { Observable } from 'rxjs';
+import { ApienviadorService } from 'src/app/services/apienviador.service';
+import { Toast, ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-turnos-enviador',
@@ -23,7 +22,6 @@ export class TurnosEnviadorComponent implements OnInit {
   ) {}
 
   turnos: any = [];
-  idTurno = 0;
   cards: any;
 
   // Contadores
@@ -32,8 +30,13 @@ export class TurnosEnviadorComponent implements OnInit {
 
   // Datos del Mensaje de whatsapp
   contactoCliente = '';
-  fileMimeTypeMedia = '';
-  fileBase64Media = '';
+  fileMimeTypeMedia: any = '';
+  fileBase64Media: any = '';
+  file = {
+    fileBase64Media: '',
+    fileMimeTypeMedia: '',
+  };
+
   mensajePie = `Se ha registrado su turno! 😁
 Para cualquier consulta, contáctanos llamando al 0214129000 o escribinos al siguiente link:
 https://wa.me/595214129000`;
@@ -53,6 +56,9 @@ https://wa.me/595214129000`;
   mood = 'Trabajando! 👨🏻‍💻';
   moodNotificado = 0;
 
+  // Ticket
+  ticket: object = {};
+
   // Numeros a quien notificar el estado
   numeros = [
     {
@@ -69,20 +75,18 @@ https://wa.me/595214129000`;
     },
   ];
 
-  // Tiempo de retraso entre envios de mensajes 15s
-  tiempoRetraso = 15000;
-  // Tiempo de retraso entre ejecucion de consulta al PSQL cuando no hay turnos pendientes 1min
-  tiempoRetrasoPSQL = 1000 * 60;
+  // Tiempo de retraso entre envios en milisegundos. Tener en cuenta los 6 segundos entre las funciones
+  tiempoRetraso = 9000;
+  // Tiempo de retraso entre ejecucion de consulta SQL para obtener los registros de los turnos
+  tiempoRestrasoPSQL = 1000 * 60;
 
   ngOnInit(): void {
     this.getTurnosPendientes();
-
     // setInterval((): void => {
     //   let hoyAhora = new Date();
     //   let horaAhora: any = this.pipe.transform(hoyAhora, 'HH:mm');
     //   let diaHoy = horaAhora.toString().slice(0, 3);
     //   //console.log("Hoy es: ", diaHoy);
-
     //   if (horaAhora >= this.horaEntrada && horaAhora <= this.horaSalida) {
     //     if (this.moodNotificado === 0) {
     //       //this.notificarEstado('Online');
@@ -106,12 +110,6 @@ https://wa.me/595214129000`;
     let hoyAhora = new Date();
     let fechaGetTurnos = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
 
-    /*
-      COLOCAR EL IF DEL HORARIO LABORAL DEL ENVIADOR ACA
-      SI ESTA DENTRO DEL HORARIO EJECUTAR EL GET Y EL FOR
-      SI NO EJECUTAR SOLO EL FOR
-    */
-
     this.api
       .get('turnosPendientes')
       .pipe(
@@ -120,7 +118,7 @@ https://wa.me/595214129000`;
           if (this.turnos.length === 0) {
             this.getTotaldeEnvios();
             this.toastr.warning(
-              'Sin turnos pendientes de notificacion!',
+              'Sin agendamientos pendientes de envio!',
               'Alerta!',
               {
                 timeOut: 1000 * 60,
@@ -128,15 +126,14 @@ https://wa.me/595214129000`;
               }
             );
 
-            // Si no hay turnos nuevos cargados en el PSQL se vuelve a llamar al for cada 15 seg
+            //Si no hay turnos nuevos cargados en el PSQL se vuelve a llamar al for luego de 15 seg
             setTimeout(() => {
-              //console.log('No hay turnos entoces me ejecuto cada 1min');
               this.iniciarEnvio();
-            }, this.tiempoRetrasoPSQL);
+            }, this.tiempoRestrasoPSQL);
           } else {
             console.log(
               'Turnos pendientes de notificacion: ',
-              this.turnos.length,
+              this.turnos,
               fechaGetTurnos
             );
 
@@ -159,214 +156,191 @@ https://wa.me/595214129000`;
       });
   }
 
-  // Funcion de retraso para el for()
-  sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  funcionPromesa = (t: any, fechaEnvio: any) =>
+    new Promise((r) => setTimeout(r, 1000))
+      .then((res) => this.funcionUno(t, fechaEnvio))
+      .then((res) => this.funcionDos(res))
+      .then((res) => this.funcionTres(res, t.id_turno));
 
   async iniciarEnvio() {
-    //console.log('Inicia el envio!');
-    // La fecha y hora que se envia el mensaje
-    let hoyAhora = new Date();
-    let fechaFinFor = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
-
     if (this.turnos.length === 0) {
-      this.toastr.info('Sin turnos por el momento!', 'Iniciar Envios!', {
+      this.toastr.info('Sin turnos por el momento!', 'Alerta!', {
         timeOut: 1000,
         progressBar: true,
       });
     }
 
     for (let t of this.turnos) {
-      (<HTMLInputElement>document.getElementById('card')).innerHTML = ''
       // La fecha y hora que se envia el mensaje
       let hoyAhora = new Date();
       let fechaEnvio = this.pipe.transform(hoyAhora, 'dd/MM/yyyy HH:mm');
-
-      // let fecha_turno = t.FECHA;
-      // let hora_turno = t.HORA;
-      // let profesional = t.NOMBRE_COMERCIAL; // Doctor
-      // let sucursal = t.SUCURSAL;
-      // let dir_sucursal = t.DIRECCION;
-      // let cliente = t.CLIENTE;
-      // let plan_cliente = t.PLAN_CLIENTE;
-      // let nro_cert_cliente = t.NRO_CERT;
-
+      // Se resetean las variables
+      this.ticket = {};
+      (<HTMLInputElement>document.getElementById('card')).innerHTML = '';
+      this.contactoCliente = '';
+      // Se guardan las variables globales
       this.contactoCliente = t.TELEFONO_MOVIL;
 
-      // Se crea la variable del ID del turno. para modificar su estado una vez que se envie el mensaje
-      let idTurno = t.id_turno;
-
-      // Aca se forma la tarjeta con los datos del turno
-      this.cards =
-        `
-        <img class="card-img-top" src="../../../assets/img/odontos.svg" alt="Card image cap" id="imagen">
-        <div class="card-body" id="card-body" style="background-color: white;">
-          <h6 class="card-title">` +
-        t.CLIENTE +
-        `</h6>
-        <p class="card-text" style="margin-bottom: 0px">` +
-        t.PLAN_CLIENTE +
-        `</p>
-        <p class="card-text" style="margin-top: 0px; margin-bottom: 2px">` +
-        t.NRO_CERT +
-        `</p>
-              <h5 class="card-title" style="margin: 0px;">Fecha: ` +
-        t.FECHA +
-        `</h5>
-              <h5 class="card-title" style="margin-top: 0px;">Hora: ` +
-        t.HORA +
-        `</h5>
-              <h6 class="card-subtitle mb-2 text-muted">Sucursal: ` +
-        t.SUCURSAL +
-        `</h6>
-        <p class="card-text" style="margin-top: 0px;"><small class="text-muted">` +
-        t.DIRECCION +
-        `</small></p>
-
-              <h6 class="card-subtitle mb-2 text-muted">` +
-        t.NOMBRE_COMERCIAL +
-        `</h6>
-
-        <p class="card-text" style="margin-bottom: 2px">` +
-        this.textoAtencion +
-        `</p>
-
-        <p class="card-text" style="margin: 0px;">` +
-        fechaEnvio +
-        `</p>
-        </div>
-        `;
-
-      // Aca se escribe en el DOM
-      (<HTMLInputElement>document.getElementById('card')).innerHTML =
-        this.cards;
-
-      // Se retrasa la llamada a la función debido a que el DOM no renderiza de inmediato el logo de odontos
-      setTimeout(() => {
-        this.crearImg(idTurno);
-      }, 2000);
-
-      // Se llama a la funcion de retraso para ejecutar todo cada 15 segundos
-      await this.sleep(this.tiempoRetraso);
+      await this.funcionPromesa(t, fechaEnvio);
     }
 
-    //console.log('fin del for - inicio getTurnos', fechaFinFor);
-    this.turnos = [];
-    // Al finalizar el for se vuelve a consultar al PSQL por los sgts turnos con estado = 0
+    console.log('Finalizo el envio, se consulta a la base luego de 1 minuto');
+
     this.toastr.info('Consultando nuevos turnos...', 'Finalizo el envío!', {
       timeOut: 1000 * 60,
       progressBar: true,
     });
+
     setTimeout(() => {
+      // console.log(
+      //   'Se consulto a la base y se trajeron nuevos turnos pendientes'
+      // );
       this.getTurnosPendientes();
     }, 1000 * 60);
   }
 
-  // Se crea la IMAGEN de la tarjeta creada
-  crearImg(idTurno: any) {
-    let node = <HTMLInputElement>document.getElementById('card');
+  // Renderiza la imagen en el HTML
+  async funcionUno(t: any, fechaEnvio: any) {
+    console.log('UNO - Renderizar imagen');
+    let retraso = () => new Promise((r) => setTimeout(r, 5000));
+    // Se crea un obj de la imagen para pasar a la sgt funcion. Tambien se puede hacer global pero mejor probar local por el momento para evitar err
 
-    htmlToImage
-      .toJpeg(node)
-      .then((dataUrl) => {
-        var img = new Image();
-        img.src = dataUrl;
+    // Aca se forma la tarjeta con los datos del turno
+    this.cards =
+      `
+    <img class="card-img-top" src="../../../assets/img/odontos.svg" alt="Card image cap" id="imagen">
+    <div class="card-body" id="card-body" style="background-color: white;">
+      <h6 class="card-title">` +
+      t.CLIENTE +
+      `</h6>
+    <p class="card-text" style="margin-bottom: 0px">` +
+      t.PLAN_CLIENTE +
+      `</p>
+    <p class="card-text" style="margin-top: 0px; margin-bottom: 2px">` +
+      t.NRO_CERT +
+      `</p>
+          <h5 class="card-title" style="margin: 0px;">Fecha: ` +
+      t.FECHA +
+      `</h5>
+          <h5 class="card-title" style="margin-top: 0px;">Hora: ` +
+      t.HORA +
+      `</h5>
+          <h6 class="card-subtitle mb-2 text-muted">Sucursal: ` +
+      t.SUCURSAL +
+      `</h6>
+    <p class="card-text" style="margin-top: 0px;"><small class="text-muted">` +
+      t.DIRECCION +
+      `</small></p>
 
-        this.fileMimeTypeMedia = img.src.split(';base64,')[0];
-        this.fileMimeTypeMedia = this.fileMimeTypeMedia.slice(5);
-        this.fileBase64Media = img.src.split(',')[1];
+          <h6 class="card-subtitle mb-2 text-muted">` +
+      t.NOMBRE_COMERCIAL +
+      `</h6>
 
-        this.cargarObj(
-          //contacto,
-          idTurno,
-          //cliente,
-          this.fileBase64Media,
-          this.fileMimeTypeMedia
-        );
-      })
-      .catch(function (error) {
-        console.error('Error al crear la imagen!', error);
-      });
+    <p class="card-text" style="margin-bottom: 2px">` +
+      this.textoAtencion +
+      `</p>
 
-    // Descargar imagen en JPEG
-    // let image = <HTMLInputElement>document.getElementById('card');
+    <p class="card-text" style="margin: 0px;">` +
+      fechaEnvio +
+      `</p>
+    </div>
+    `;
 
-    // htmlToImage
-    //   .toJpeg(image, {
-    //     quality: 0.95,
-    //   })
-    //   .then(function (dataUrl) {
-    //     var link = document.createElement('a');
-    //     link.download = cliente + '.jpeg';
-    //     link.href = dataUrl;
-    //     link.click();
-    //   });
+    // Aca se escribe en el DOM
+    (<HTMLInputElement>document.getElementById('card')).innerHTML = this.cards;
+    console.log(' -Imagen renderizada');
+    console.log(' -Crear imagen en base64');
+
+    setTimeout(() => {
+      let node = <HTMLInputElement>document.getElementById('card');
+      //console.log(node);
+
+      htmlToImage
+        .toJpeg(node)
+        .then((dataUrl) => {
+          var img = new Image();
+          img.src = dataUrl;
+
+          this.fileMimeTypeMedia = img.src.split(';base64,')[0];
+          this.fileMimeTypeMedia = this.fileMimeTypeMedia.slice(5);
+          this.fileBase64Media = img.src.split(',')[1];
+
+          this.file.fileBase64Media = this.fileBase64Media;
+          this.file.fileMimeTypeMedia = this.fileMimeTypeMedia;
+        })
+        .then(() => {
+          console.log(' -Imagen en base64 creada');
+          //console.log(' -File primero', this.file);
+        })
+        .catch(function (error) {
+          console.error('Error al crear la imagen!', error);
+        });
+    }, 2000);
+
+    await retraso();
   }
 
-  // Se crea el objeto del mensaje con la imagen creada a enviar por la API
-  cargarObj(
-    //contacto: any,
-    idTurno: any,
-    //cliente: any,
-    base64: any,
-    mimeType: any
-  ) {
-    let objWa = {
+  // Crear el objeto mensaje a enviar a la API de WhatsappWeb
+  funcionDos(res: any) {
+    console.log('DOS - Crear objeto de mensaje para enviar');
+    let objWa = {};
+
+    objWa = {
       message: this.mensajePie,
       phone: this.contactoCliente,
-      mimeType: mimeType,
-      data: base64,
+      mimeType: this.file.fileMimeTypeMedia,
+      data: this.file.fileBase64Media,
       fileName: '',
       fileSize: 0,
     };
-    //console.log("Lo que se envia: ", objWa);
-    //this.enviarMensaje(objWa, idTurno, cliente);
-    this.enviarMensaje(objWa, idTurno);
+
+    console.log(' -Objeto creado');
+    //console.log(' -Objeto creado', objWa);
+    return objWa;
   }
 
-  // Se envia el mensaje atravez de la API de WhatsappWeb
-  enviarMensaje(objWa: any, idTurno: any) {
-    (<HTMLInputElement>document.getElementById('card')).innerHTML = ''
-    //let turnoId = this.idTurno;
+  // Se envia el objeto del mensaje a la API de WhatsappWeb
+  async funcionTres(res: any, id_turno: any) {
+    console.log('TRES - Enviar a la API', id_turno);
+    console.log(' Tercero', res);
+    let retraso = () => new Promise((r) => setTimeout(r, this.tiempoRetraso));
+
     this.apiEnviador
-      .post('lead', objWa)
+      .post('lead', res)
       .pipe(
         map((data: any) => {
-          let objetoRetorno;
-          objetoRetorno = data;
-          //console.log('Este es el objeto retorno POST: ', objetoRetorno);
-
+          // Si no se reconoce el nro
           if (data.responseExSave.unknow) {
             //console.log('Error SIN WHATSAPP nro: ', objWa.phone);
             // Se puede auto enviar un mensaje indicando que no se envió por X problema
             //this.notificarError(objWa.phone, idTurno, cliente);
-            this.updateEstatusUNKNOW(idTurno);
             this.contactoCliente = '';
+            this.updateEstatusUNKNOW(id_turno);
           }
-
+          // Si hay algun error se pasa el codigo del error
           if (data.responseExSave.error) {
             //console.log('Error en este nro: ', objWa.phone);
             // Se puede auto enviar un mensaje indicando que no se envió por X problema
             //this.notificarError(objWa.phone, idTurno, cliente);
+            this.contactoCliente = '';
             const errMsg = data.responseExSave.error.slice(0, 17);
             if (errMsg === 'Escanee el código') {
-              this.updateEstatusERROR(idTurno, 104);
+              this.updateEstatusERROR(id_turno, 104);
             }
             // Indica que se cerró la sesion o la ventana. Envios se iniciar al abrir la sesion o la ventana
             if (errMsg === 'Protocol error (R') {
-              this.updateEstatusERROR(idTurno, 105);
+              this.updateEstatusERROR(id_turno, 105);
             }
             // Indica que el campo nro esta mal escrito
             if (errMsg === 'Evaluation failed') {
-              this.updateEstatusERROR(idTurno, 106);
+              this.updateEstatusERROR(id_turno, 106);
             }
-            this.contactoCliente = '';
           }
-
           // Si el envio fue exitoso
           if (data.responseExSave.id) {
-            //console.log('ENVIO CORRECTO id_turno: ', idTurno);
-            this.updateEstatusOK(idTurno);
             this.contactoCliente = '';
+            console.log(' -ENVIO CORRECTO id_turno: ', id_turno);
+            this.updateEstatusOK(id_turno);
           }
         })
       )
@@ -378,6 +352,8 @@ https://wa.me/595214129000`;
           //console.log('Error en la consulta POST: ', msg.message);
         },
       });
+
+    await retraso();
   }
 
   // Una vez que el envio haya sido exitoso. Se actualiza el estado del turno en la DB PostgreSQL
@@ -393,7 +369,10 @@ https://wa.me/595214129000`;
         map((data: any) => {
           let estatusOk;
           estatusOk = data;
-          //console.log('Se actualiza el estado del envio PUT STATUS OK: ', estatusOk);
+          console.log(
+            'CUATRO - Se actualiza el estado del envio PUT STATUS OK: ',
+            estatusOk
+          );
           this.getTotaldeEnvios();
         })
       )
@@ -470,33 +449,6 @@ https://wa.me/595214129000`;
       });
   }
 
-  // En caso de tener error en el envio de agendamiento de turno al cliente, se le notifica al numero vinculado con los datos del cliente
-  notificarError(contacto: any, idTurno: any, cliente: any) {
-    let objWa = {
-      message:
-        'No se pudo enviar la notificación de agendamiento del turno al cliente: ' +
-        cliente +
-        ' con el número: ' +
-        contacto +
-        ' ID de turno: ' +
-        idTurno,
-      phone: '595986153301',
-      mimeType: '',
-      data: '',
-      fileName: '',
-      fileSize: 0,
-    };
-
-    this.apiEnviador.post('lead', objWa).subscribe({
-      next(result: any) {
-        //console.log('Resultado de la notificación: ', result);
-      },
-      error(msg) {
-        //console.log('Error en la petición POST: ', msg.message);
-      },
-    });
-  }
-
   // Notifica el estado del Enviador cada vez que cambie de estado
   notificarEstado(estadoActual: any) {
     let hoyAhora = new Date();
@@ -566,5 +518,32 @@ Fecha: ` +
       // Cambia el valor de moodNotificado si se envió el mensaje
       this.moodNotificado = 0;
     }
+  }
+
+  // En caso de tener error en el envio de agendamiento de turno al cliente, se le notifica al numero vinculado con los datos del cliente
+  notificarError(contacto: any, idTurno: any, cliente: any) {
+    let objWa = {
+      message:
+        'No se pudo enviar la notificación de agendamiento del turno al cliente: ' +
+        cliente +
+        ' con el número: ' +
+        contacto +
+        ' ID de turno: ' +
+        idTurno,
+      phone: '595986153301',
+      mimeType: '',
+      data: '',
+      fileName: '',
+      fileSize: 0,
+    };
+
+    this.apiEnviador.post('lead', objWa).subscribe({
+      next(result: any) {
+        //console.log('Resultado de la notificación: ', result);
+      },
+      error(msg) {
+        //console.log('Error en la petición POST: ', msg.message);
+      },
+    });
   }
 }

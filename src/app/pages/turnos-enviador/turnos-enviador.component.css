@@ -10,15 +10,12 @@ table {
   font-size: x-small;
   height: 600px;
   padding-bottom: 5px;
+  padding-top: 5px;
 }
 
 .body-header {
   background-color: rgb(25,25,25);
   font-family: verdana;
   font-size: x-small;
-}
-
-#cards {
-  background-image: "../../../assets/img/backTurno.jpeg";
 }
 
