@@ -327,11 +327,11 @@ https://wa.me/595214129000`;
             if (errMsg === 'Escanee el código') {
               this.updateEstatusERROR(id_turno, 104);
             }
-            // Indica que se cerró la sesion o la ventana. Envios se iniciar al abrir la sesion o la ventana
+            // Sesion cerrada o desvinculada. Puede que se envie al abrir la sesion o al vincular
             if (errMsg === 'Protocol error (R') {
               this.updateEstatusERROR(id_turno, 105);
             }
-            // Indica que el campo nro esta mal escrito
+            // El numero esta mal escrito o supera los 12 caracteres
             if (errMsg === 'Evaluation failed') {
               this.updateEstatusERROR(id_turno, 106);
             }
